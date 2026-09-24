@@ -49,7 +49,7 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.wrap{max-width:2000px;margin:0 auto;padding:16px 28px 114px;height:100vh;height:100dvh;display:flex;flex-direction:column}
+.wrap{max-width:2000px;margin:0 auto;padding:16px 28px 62px;height:100vh;height:100dvh;display:flex;flex-direction:column}
 header{flex-shrink:0}
 form.search{flex-shrink:0;width:100%}
 
@@ -339,29 +339,36 @@ h2{
 
 /* แถบทางลัดด้านล่าง */
 .dock{
-  position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:10;
-  display:flex;align-items:center;gap:6px;
-  max-width:calc(100vw - 32px);overflow-x:auto;
-  padding:8px 12px;
+  position:fixed;left:50%;bottom:8px;transform:translateX(-50%);z-index:10;
+  display:flex;align-items:center;gap:4px;
+  max-width:calc(100vw - 32px);overflow-x:auto;overflow-y:hidden;
+  padding:5px 8px;
   background:var(--glass-bg);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--line);border-radius:22px;
-  box-shadow:8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+  border:1px solid var(--line);border-radius:14px;
+  box-shadow:4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+  scrollbar-width:none;
 }
+.dock::-webkit-scrollbar{display:none}
 .dock .tile{
-  flex:0 0 auto;min-width:68px;padding:7px 10px 5px;gap:4px;
-  background:transparent;box-shadow:none;border-radius:14px;
+  flex:0 0 auto;flex-direction:row;gap:7px;padding:4px 10px 4px 6px;
+  background:transparent;box-shadow:none;border-radius:10px;
 }
-.dock .tile:hover{background:var(--line);transform:translateY(-3px);box-shadow:none}
-.dock .ico{width:36px;height:36px;font-size:16px}
-.dock .tile span.n{font-size:11px;color:var(--mute);max-width:64px}
-.dock .tile .del{top:1px;right:1px;width:18px;height:18px;font-size:13px}
+.dock .tile:hover{background:var(--line);transform:none;box-shadow:none}
+.dock .ico{width:24px;height:24px;border-radius:7px;font-size:12px}
+.dock .ico span{font-size:12px}
+.dock .tile span.n{font-size:12px;color:var(--ink);max-width:110px}
+.dock .tile .del{top:50%;right:2px;transform:translateY(-50%);width:16px;height:16px;font-size:12px;background:var(--panel)}
 .dock .add-tile{
-  flex:0 0 auto;min-height:0;min-width:68px;padding:11px 10px;
-  border:1px dashed var(--line);box-shadow:none;background:transparent;
+  flex:0 0 auto;flex-direction:row;gap:5px;min-height:0;padding:5px 10px;
+  border:1px dashed var(--line);box-shadow:none;background:transparent;font-size:12px;
 }
-.dock .add-tile:hover{background:var(--line);transform:none}
-.dock .add-tile b{font-size:20px}
+.dock .add-tile:hover{background:var(--line)}
+.dock .add-tile b{font-size:16px}
+
+/* แถบเลื่อนสีเข้มให้เข้ากับธีม */
+:root[data-theme=dark]{color-scheme:dark}
+*{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 
 /* Todo / List */
 .todo input[type=text], .todo input[type=date], .todo select, .todo input[type=time]{
@@ -493,7 +500,7 @@ dialog input:focus{outline:0;border-color:var(--accent)}
   main{grid-template-columns:1fr;flex:none}
   main > section{height:auto;overflow:visible}
   .clock{font-size:38px}
-  .wrap{padding:14px 16px 114px;height:auto;display:block}
+  .wrap{padding:14px 16px 62px;height:auto;display:block}
   .header-actions{position:static;margin-bottom:12px;justify-content:center}
   header{align-items:stretch}
 }
@@ -508,6 +515,23 @@ dialog input:focus{
 dialog input{border:1.5px solid color-mix(in srgb, var(--accent) 65%, transparent)}
 form.search{border:1.5px solid color-mix(in srgb, var(--accent) 65%, transparent)}
 form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent)}
+
+/* พื้นหลังอนิเมชั่น */
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1}
+.bg-pop{
+  position:absolute;top:calc(100% + 8px);right:0;z-index:20;
+  display:flex;flex-direction:column;min-width:180px;padding:6px;
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  box-shadow:6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+}
+.bg-pop[hidden]{display:none}
+.bg-pop{white-space:nowrap;min-width:0;padding:7px 14px;font-size:13px;font-weight:600;pointer-events:none}
+.bg-pop button{border:0;background:transparent;text-align:left;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--ink)}
+.bg-pop button:hover{background:var(--line)}
+.bg-pop button.on{color:var(--accent);font-weight:700}
+:root.has-bg{--glass-bg:rgba(228,235,245,.62)}
+:root.has-bg[data-theme=dark]{--glass-bg:rgba(18,20,28,.62)}
 
 /* ปุ่มเปลี่ยนสี */
 .color-btn{
@@ -546,6 +570,7 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
 </style>
 </head>
 <body>
+<canvas id="bg" aria-hidden="true"></canvas>
 <div class="wrap">
   <header>
     <div class="header-actions">
@@ -553,6 +578,8 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
       <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
       <button class="color-btn" id="colorBtn" type="button" title="เปลี่ยนสี" aria-label="เปลี่ยนสีหลัก"><i></i></button>
       <div class="color-pop" id="colorPop" hidden></div>
+      <button class="color-btn" id="bgBtn" type="button" title="เปลี่ยนอนิเมชั่นพื้นหลัง" aria-label="เลือกอนิเมชั่นพื้นหลัง"><span style="font-size:15px;line-height:1;color:var(--accent)">✦</span></button>
+      <div class="bg-pop" id="bgPop" hidden></div>
     </div>
     <div class="clock-container">
       <div class="clock" id="clock">00:00</div>
@@ -627,8 +654,7 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
         </div>
         
         <form id="todoForm" onsubmit="addOrUpdateTask(event)">
-          <input type="text" id="todoInput" placeholder="ทำอะไรดีวันนี้
-          " maxlength="200" required aria-label="เพิ่มงานใหม่">
+          <input type="text" id="todoInput" placeholder="  วันนี้ทำอะไรดี " maxlength="200" required aria-label="เพิ่มงานใหม่">
           <div style="display:flex; gap:8px;">
             <input type="date" id="todoDate" aria-label="วันที่เริ่มต้น" style="flex:1; min-width:0">
             <input type="time" id="todoTime" value="09:00" aria-label="เวลา" style="flex:0 0 132px; min-width:0">
@@ -743,9 +769,226 @@ ACCENTS.forEach(c => {
   $('#colorPop').appendChild(b);
 });
 setAccent(load('accent', ACCENTS[0]));
-$('#colorBtn').onclick = e => { e.stopPropagation(); $('#colorPop').hidden = !$('#colorPop').hidden; };
-document.addEventListener('click', e => { if (!e.target.closest('#colorPop')) $('#colorPop').hidden = true; });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#colorPop').hidden = true; });
+$('#colorBtn').onclick = e => { e.stopPropagation(); $('#bgPop').hidden = true; $('#colorPop').hidden = !$('#colorPop').hidden; };
+document.addEventListener('click', e => {
+  if (!e.target.closest('#colorPop')) $('#colorPop').hidden = true;
+  if (!e.target.closest('#bgPop')) $('#bgPop').hidden = true;
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('#colorPop').hidden = true; $('#bgPop').hidden = true; } });
+
+/* ---------- อนิเมชั่นพื้นหลัง ---------- */
+const BG_MODES = [
+  { id: 'aurora',  label: 'แสงออโรรา' },
+  { id: 'stars',   label: 'ดวงดาว (โหมดสว่างเป็นเมฆ)' },
+  { id: 'network', label: 'อนุภาคเชื่อมเส้น' },
+  { id: 'rain',    label: 'ฝน' },
+  { id: 'snow',    label: 'หิมะ' },
+  { id: 'none',    label: 'ไม่มีอนิเมชั่น' }
+];
+const bgCanvas = $('#bg');
+const bctx = bgCanvas.getContext('2d');
+let bgMode = load('bgMode', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'none' : 'aurora');
+if (!BG_MODES.some(m => m.id === bgMode)) bgMode = 'aurora';
+let bgW = 0, bgH = 0, bgRAF = 0, bgLast = 0, bgFrame = 0, bgState = {};
+let bgAccent = { h: 262, s: 90, l: 66 }, bgDark = true;
+const rnd = (a, b) => a + Math.random() * (b - a);
+
+function hexToHsl(hex) {
+  hex = hex.trim().replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const r = parseInt(hex.slice(0, 2), 16) / 255, g = parseInt(hex.slice(2, 4), 16) / 255, b = parseInt(hex.slice(4, 6), 16) / 255;
+  if ([r, g, b].some(isNaN)) return null;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  let h = 0, sat = 0; const l = (max + min) / 2;
+  if (d) {
+    sat = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+  }
+  return { h, s: sat * 100, l: l * 100 };
+}
+function refreshBgColors() {
+  const a = getComputedStyle(root).getPropertyValue('--accent');
+  const c = a && hexToHsl(a);
+  if (c) bgAccent = c;
+  bgDark = root.dataset.theme === 'dark';
+}
+
+function initMode() {
+  const S = {};
+  const area = bgW * bgH;
+  if (bgMode === 'aurora') {
+    S.blobs = [
+      { x: .2, y: .3, r: .45, sp: .00007, ph: 0, hOff: 0 },
+      { x: .75, y: .25, r: .4, sp: .00009, ph: 2, hOff: 45 },
+      { x: .5, y: .8, r: .5, sp: .00006, ph: 4, hOff: -45 }
+    ];
+  } else if (bgMode === 'stars') {
+    S.stars = Array.from({ length: Math.round(area / 7000) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), r: rnd(.4, 1.4), ph: rnd(0, 6.28), sp: rnd(.0006, .002) }));
+    S.sh = null; S.next = performance.now() + 2500;
+    S.clouds = Array.from({ length: 7 }, () => {
+      const sz = rnd(60, 130);
+      return { x: rnd(-200, bgW), y: rnd(0, bgH * .85), v: rnd(6, 16), sz,
+        puffs: Array.from({ length: 5 }, (_, i) => ({ dx: (i - 2) * sz * .55 + rnd(-10, 10), dy: rnd(-sz * .18, sz * .18), r: sz * rnd(.55, .85) })) };
+    });
+  } else if (bgMode === 'network') {
+    S.pts = Array.from({ length: Math.min(90, Math.round(area / 16000)) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), vx: rnd(-22, 22), vy: rnd(-22, 22), r: rnd(1, 2.2) }));
+  } else if (bgMode === 'rain') {
+    S.drops = Array.from({ length: Math.min(260, Math.round(bgW / 6)) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), l: rnd(10, 24), v: rnd(600, 950) }));
+  } else if (bgMode === 'snow') {
+    S.flakes = Array.from({ length: Math.min(200, Math.round(bgW / 9)) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), r: rnd(1, 3.2), v: rnd(22, 60), ph: rnd(0, 6.28), sw: rnd(.4, 1.2) }));
+  }
+  bgState = S;
+}
+
+const bgDraw = {
+  aurora(t) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.globalCompositeOperation = bgDark ? 'lighter' : 'source-over';
+    bgState.blobs.forEach(b => {
+      const x = (b.x + Math.sin(t * b.sp + b.ph) * .18) * bgW;
+      const y = (b.y + Math.cos(t * b.sp * 1.3 + b.ph) * .15) * bgH;
+      const r = b.r * Math.max(bgW, bgH);
+      const hue = (bgAccent.h + b.hOff + 360) % 360;
+      const g = bctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `hsla(${hue},${Math.max(60, bgAccent.s)}%,${bgDark ? 55 : 68}%,${bgDark ? .24 : .3})`);
+      g.addColorStop(1, `hsla(${hue},80%,60%,0)`);
+      bctx.fillStyle = g;
+      bctx.fillRect(0, 0, bgW, bgH);
+    });
+    bctx.globalCompositeOperation = 'source-over';
+  },
+  stars(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    const S = bgState;
+    if (bgDark) {
+      S.stars.forEach(st => {
+        const a = .3 + .7 * (.5 + .5 * Math.sin(t * st.sp + st.ph));
+        bctx.fillStyle = `rgba(255,255,255,${(a * .8).toFixed(3)})`;
+        bctx.beginPath(); bctx.arc(st.x, st.y, st.r, 0, 6.283); bctx.fill();
+      });
+      if (!S.sh && t > S.next) S.sh = { x: rnd(bgW * .3, bgW), y: rnd(0, bgH * .4), vx: -rnd(500, 800), vy: rnd(250, 400), life: 0 };
+      if (S.sh) {
+        const sh = S.sh, mag = Math.hypot(sh.vx, sh.vy), len = 130;
+        sh.x += sh.vx * dt; sh.y += sh.vy * dt; sh.life += dt;
+        const tx = sh.x - sh.vx / mag * len, ty = sh.y - sh.vy / mag * len;
+        const g = bctx.createLinearGradient(sh.x, sh.y, tx, ty);
+        g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+        bctx.strokeStyle = g; bctx.lineWidth = 1.6;
+        bctx.beginPath(); bctx.moveTo(sh.x, sh.y); bctx.lineTo(tx, ty); bctx.stroke();
+        if (sh.life > 1.6 || sh.x < -len || sh.y > bgH + len) { S.sh = null; S.next = t + rnd(4000, 12000); }
+      }
+    } else {
+      S.clouds.forEach(c => {
+        c.x += c.v * dt;
+        if (c.x - c.sz * 2 > bgW) c.x = -c.sz * 2;
+        c.puffs.forEach(p => {
+          const cx = c.x + p.dx, cy = c.y + p.dy;
+          const sh = bctx.createRadialGradient(cx, cy + p.r * .18, 0, cx, cy + p.r * .18, p.r);
+          sh.addColorStop(0, 'rgba(110,140,195,.2)'); sh.addColorStop(1, 'rgba(110,140,195,0)');
+          bctx.fillStyle = sh; bctx.beginPath(); bctx.arc(cx, cy + p.r * .18, p.r, 0, 6.283); bctx.fill();
+          const g = bctx.createRadialGradient(cx, cy, 0, cx, cy, p.r);
+          g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+          bctx.fillStyle = g; bctx.beginPath(); bctx.arc(cx, cy, p.r, 0, 6.283); bctx.fill();
+        });
+      });
+    }
+  },
+  network(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    const pts = bgState.pts, L = 140;
+    const col = a => `hsla(${bgAccent.h},${Math.max(60, bgAccent.s)}%,${bgDark ? 70 : 45}%,${a})`;
+    pts.forEach(p => {
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if (p.x < 0 || p.x > bgW) p.vx *= -1;
+      if (p.y < 0 || p.y > bgH) p.vy *= -1;
+    });
+    bctx.lineWidth = 1;
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+        if (d < L) {
+          bctx.strokeStyle = col(((1 - d / L) * .35).toFixed(3));
+          bctx.beginPath(); bctx.moveTo(pts[i].x, pts[i].y); bctx.lineTo(pts[j].x, pts[j].y); bctx.stroke();
+        }
+      }
+    }
+    bctx.fillStyle = col(.7);
+    pts.forEach(p => { bctx.beginPath(); bctx.arc(p.x, p.y, p.r, 0, 6.283); bctx.fill(); });
+  },
+  rain(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.strokeStyle = bgDark ? 'rgba(170,195,255,.35)' : 'rgba(70,100,170,.35)';
+    bctx.lineWidth = 1;
+    bctx.beginPath();
+    bgState.drops.forEach(d => {
+      bctx.moveTo(d.x, d.y); bctx.lineTo(d.x + d.l * .15, d.y + d.l);
+      d.y += d.v * dt; d.x += d.v * .15 * dt;
+      if (d.y > bgH) { d.y = -d.l; d.x = rnd(-bgH * .15, bgW); }
+      if (d.x > bgW) d.x = -10;
+    });
+    bctx.stroke();
+  },
+  snow(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.fillStyle = bgDark ? 'rgba(255,255,255,.8)' : 'rgba(120,150,210,.75)';
+    bgState.flakes.forEach(f => {
+      f.y += f.v * dt;
+      f.x += Math.sin(t * .001 * f.sw + f.ph) * 16 * dt;
+      if (f.y > bgH + 5) { f.y = -5; f.x = rnd(0, bgW); }
+      bctx.beginPath(); bctx.arc(f.x, f.y, f.r, 0, 6.283); bctx.fill();
+    });
+  }
+};
+
+function bgLoop(t) {
+  bgRAF = requestAnimationFrame(bgLoop);
+  const dt = Math.min(Math.max((t - bgLast) / 1000, 0) || 0, .05);
+  bgLast = t;
+  if (++bgFrame % 30 === 0) refreshBgColors();
+  bgDraw[bgMode](t, dt);
+}
+function resizeBg() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  bgW = innerWidth; bgH = innerHeight;
+  bgCanvas.width = bgW * dpr; bgCanvas.height = bgH * dpr;
+  bctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (bgMode !== 'none') initMode();
+}
+function startBg() {
+  cancelAnimationFrame(bgRAF);
+  bctx.clearRect(0, 0, bgW, bgH);
+  root.classList.toggle('has-bg', bgMode !== 'none');
+  bgCanvas.style.display = bgMode === 'none' ? 'none' : 'block';
+  if (bgMode === 'none') return;
+  initMode(); refreshBgColors();
+  bgLast = performance.now();
+  bgRAF = requestAnimationFrame(bgLoop);
+}
+let bgToastTimer;
+function showBgToast() {
+  const i = BG_MODES.findIndex(m => m.id === bgMode);
+  const pop = $('#bgPop');
+  pop.textContent = `${i + 1}/${BG_MODES.length}  ${BG_MODES[i].label}`;
+  pop.hidden = false;
+  clearTimeout(bgToastTimer);
+  bgToastTimer = setTimeout(() => { pop.hidden = true; }, 1500);
+}
+$('#bgBtn').onclick = e => {
+  e.stopPropagation();
+  $('#colorPop').hidden = true;
+  const i = BG_MODES.findIndex(m => m.id === bgMode);
+  bgMode = BG_MODES[(i + 1) % BG_MODES.length].id;
+  save('bgMode', bgMode);
+  startBg();
+  showBgToast();
+};
+let bgResizeTimer;
+addEventListener('resize', () => { clearTimeout(bgResizeTimer); bgResizeTimer = setTimeout(resizeBg, 150); });
+resizeBg();
+startBg();
 
 /* ---------- นาฬิกาและการแจ้งเตือน ---------- */
 function tick() {
