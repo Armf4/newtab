@@ -426,10 +426,38 @@ li{
   padding:10px 8px;
   border-bottom: 1px solid var(--line);
 }
+/* ปุ่มติ๊กเสร็จ แบบ Neumorphism (ไอคอนวงกลมประ + เครื่องหมายถูก) */
+:root{
+  --chk-off: #9a9db5;
+  --chk-on: linear-gradient(135deg,#8be04a,#5cc51e);
+}
+:root[data-theme=dark]{
+  --chk-off: linear-gradient(135deg,#22d3ff,#00b4ff);
+  --chk-on: linear-gradient(135deg,#ffc21a,#f0620a);
+}
 li input[type=checkbox]{
-  width:18px;height:18px;
-  accent-color:var(--accent);
-  flex:none;cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+  position:relative;
+  width:34px; height:34px; flex:none; margin:0;
+  cursor:pointer;
+  background:var(--bg);
+  border-radius:11px;
+  box-shadow:4px 4px 9px var(--shadow-dark), -4px -4px 9px var(--shadow-light);
+  transition:border-radius .25s, box-shadow .25s, transform .15s;
+}
+li input[type=checkbox]::before{
+  content:""; position:absolute; inset:5px;
+  background:var(--chk-off);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9' pathLength='100' stroke-dasharray='72 4 6 4 10 4' transform='rotate(-60 12 12)'/%3E%3Cpath d='M7.8 12.4l3 3 5.4-6.2'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9' pathLength='100' stroke-dasharray='72 4 6 4 10 4' transform='rotate(-60 12 12)'/%3E%3Cpath d='M7.8 12.4l3 3 5.4-6.2'/%3E%3C/svg%3E") center/contain no-repeat;
+  transition:background .25s;
+}
+li input[type=checkbox]:checked{border-radius:50%}
+li input[type=checkbox]:checked::before{background:var(--chk-on)}
+li input[type=checkbox]:hover{transform:scale(1.05)}
+li input[type=checkbox]:active{
+  transform:scale(.96);
+  box-shadow:inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
 }
 li .t-content{display:flex;flex-direction:column;flex:1;min-width:0}
 li .t{word-break:break-word;cursor:text;font-size:14px}
@@ -578,7 +606,7 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
       <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
       <button class="color-btn" id="colorBtn" type="button" title="เปลี่ยนสี" aria-label="เปลี่ยนสีหลัก"><i></i></button>
       <div class="color-pop" id="colorPop" hidden></div>
-      <button class="color-btn" id="bgBtn" type="button" title="เปลี่ยนอนิเมชั่นพื้นหลัง" aria-label="เลือกอนิเมชั่นพื้นหลัง"><span style="font-size:15px;line-height:1;color:var(--accent)">✦</span></button>
+      <button class="color-btn" id="bgBtn" type="button" title="เปลี่ยนอนิเมชั่นพื้นหลัง" aria-label="เลือกอนิเมชั่นพื้นหลัง"><span id="bgIcon" style="display:grid;place-items:center;width:18px;height:18px;color:var(--accent)"></span></button>
       <div class="bg-pop" id="bgPop" hidden></div>
     </div>
     <div class="clock-container">
@@ -785,6 +813,18 @@ const BG_MODES = [
   { id: 'snow',    label: 'หิมะ' },
   { id: 'none',    label: 'ไม่มีอนิเมชั่น' }
 ];
+/* ไอคอนของแต่ละโหมด (แสดงบนปุ่ม) */
+const BG_ICONS = {
+  aurora:  '<path d="M3 8.5c3-3 6 3 9 0s6 3 9 0M3 14c3-3 6 3 9 0s6 3 9 0M3 19.5c3-3 6 3 9 0s6 3 9 0"/>',
+  stars:   '<path fill="currentColor" d="M12 2.5l2.4 7.1 7.1 2.4-7.1 2.4L12 21.5l-2.4-7.1L2.5 12l7.1-2.4z"/>',
+  network: '<path d="M6 7l6 10 7-9M6 7l13 1"/><circle cx="6" cy="7" r="2.3" fill="currentColor"/><circle cx="12" cy="17" r="2.3" fill="currentColor"/><circle cx="19" cy="8" r="2.3" fill="currentColor"/>',
+  rain:    '<path d="M7 14.5a4 4 0 010-8 5 5 0 019.6 1.4A3.3 3.3 0 0117 14.5z"/><path d="M8 17.5l-1 3M12.5 17.5l-1 3M17 17.5l-1 3"/>',
+  snow:    '<path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6M9.5 4l2.5 2.5L14.5 4M9.5 20l2.5-2.5 2.5 2.5"/>',
+  none:    '<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>'
+};
+function updateBgIcon() {
+  $('#bgIcon').innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${BG_ICONS[bgMode]}</svg>`;
+}
 const bgCanvas = $('#bg');
 const bctx = bgCanvas.getContext('2d');
 let bgMode = load('bgMode', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'none' : 'aurora');
@@ -958,6 +998,7 @@ function resizeBg() {
   if (bgMode !== 'none') initMode();
 }
 function startBg() {
+  updateBgIcon();
   cancelAnimationFrame(bgRAF);
   bctx.clearRect(0, 0, bgW, bgH);
   root.classList.toggle('has-bg', bgMode !== 'none');
