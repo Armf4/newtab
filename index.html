@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>หน้าเริ่มต้น</title>
+<title>Task & Subscription App (Todo List Architecture)</title>
 <style>
 :root {
   --bg: #e4ebf5;
@@ -60,10 +60,14 @@ header{
   margin-bottom: 32px;
   position: relative;
 }
-.theme-btn{
+.header-actions {
   position: absolute;
   top: 0;
   right: 0;
+  display: flex;
+  gap: 8px;
+}
+.theme-btn, .sys-btn{
   border: none;
   background: var(--panel);
   border-radius: 12px;
@@ -71,8 +75,9 @@ header{
   box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
   transition: all 0.2s;
   font-weight: 500;
+  font-size: 13px;
 }
-.theme-btn:active{
+.theme-btn:active, .sys-btn:active{
   box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
 }
 
@@ -176,6 +181,32 @@ h2{
   align-items: center;
 }
 .count{font-weight:400;color:var(--mute);font-size:14px}
+
+/* System Status Bar (ตามไดอะแกรมส่วน Health / Service Worker) */
+.system-status {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  background: var(--panel);
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+  align-items: center;
+  justify-content: space-between;
+}
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--success);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--success);
+}
 
 /* Calendar Widget Styles */
 .calendar-header {
@@ -309,19 +340,7 @@ h2{
 .add-tile b{font-size:24px;font-weight:300;line-height:1}
 
 /* Todo / List */
-.neu-pressed {
-  background: var(--panel);
-  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-}
-.neu-btn {
-  background: var(--panel);
-  box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
-}
-.neu-btn:active {
-  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
-}
-
-.todo input[type=text], .todo input[type=date], .todo select{
+.todo input[type=text], .todo input[type=date], .todo select, .todo input[type=time]{
   width:100%;
   border: 1px solid var(--line);
   background: var(--panel);
@@ -331,7 +350,7 @@ h2{
   outline: 0;
   margin-bottom: 8px;
 }
-.todo input[type=text]:focus, .todo input[type=date]:focus, .todo select:focus{
+.todo input:focus, .todo select:focus{
   border-color: var(--accent);
 }
 
@@ -426,7 +445,7 @@ dialog input:focus{outline:0;border-color:var(--accent)}
   main{grid-template-columns:1fr}
   .clock{font-size:48px}
   .wrap{padding:24px 16px}
-  .theme-btn{position:static;margin-bottom:12px}
+  .header-actions{position:static;margin-bottom:12px;justify-content:center}
   header{align-items:stretch}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -435,7 +454,10 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 <body>
 <div class="wrap">
   <header>
-    <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
+    <div class="header-actions">
+      <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบ Push</button>
+      <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
+    </div>
     <div class="clock-container">
       <div class="clock" id="clock">00:00</div>
       <div class="date" id="date"></div>
@@ -450,9 +472,18 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 
   <main>
     <div class="left-column">
-      <!-- ส่วน Todo อ้างอิงตาม Diagram ของ index_2.html -->
+      <!-- ส่วน Todo และจำลอง Push Subscription ตามสถาปัตยกรรมระบบ -->
       <section class="todo" aria-label="รายการงาน">
-        <h2>สิ่งที่ต้องทำ <span class="count" id="count"></span></h2>
+        <h2>Task & Subscription UI <span class="count" id="count"></span></h2>
+        
+        <!--จำลองสถานะ Health / Service Worker-->
+        <div class="system-status">
+          <div class="status-indicator">
+            <span class="dot"></span>
+            <span id="healthStatus">Health: OK (store.js active)</span>
+          </div>
+          <button type="button" id="subBtn" style="border:0;background:var(--accent);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;">สมัครรับ Push</button>
+        </div>
         
         <form id="todoForm" onsubmit="addOrUpdateTask(event)">
           <input type="text" id="todoInput" placeholder="ชื่อภารกิจ เช่น ไปส่งมดแดง..." maxlength="200" required aria-label="เพิ่มงานใหม่">
@@ -469,7 +500,7 @@ dialog input:focus{outline:0;border-color:var(--accent)}
             <label style="font-size:11px; color:var(--mute); margin-bottom:2px;">วันที่สิ้นสุดการทำซ้ำ (ไม่บังคับ)</label>
             <input type="date" id="todoRepeatEnd">
           </div>
-          <button class="btn" type="submit" id="submitTaskBtn" style="width:100%">เพิ่มภารกิจ</button>
+          <button class="btn" type="submit" id="submitTaskBtn" style="width:100%">เพิ่มภารกิจ (tasks.js)</button>
         </form>
 
         <div class="filters" id="filters" style="margin-top:14px;">
@@ -482,14 +513,14 @@ dialog input:focus{outline:0;border-color:var(--accent)}
         <div class="foot"><span id="left"></span><button type="button" id="clearDone">ลบที่เสร็จแล้ว</button></div>
       </section>
 
-      <!-- ทางลัดอยู่ด้านล่าง -->
+      <!-- ทางลัด -->
       <section>
-        <h2>ทางลัด</h2>
+        <h2>ทางลัดเว็บแอป (Shortcuts)</h2>
         <div class="tiles" id="tiles"></div>
       </section>
     </div>
 
-    <!-- ปฏิทินแสดงผลพร้อมจุดบอกสถานะรายการที่มี -->
+    <!-- ปฏิทินแสดงผลจำลองตารางเวลา (Task scheduling rules) -->
     <section aria-label="ปฏิทิน">
       <div class="calendar-header">
         <button type="button" id="prevMonth" aria-label="เดือนก่อนหน้า">&lt;</button>
@@ -528,7 +559,7 @@ const getTodayStr = () => {
   return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
 };
 
-// ข้อมูลตัวอย่างเริ่มต้นตาม Diagram (index_2.html)
+/* ข้อมูลเริ่มต้นที่สอดคล้องกับสถาปัตยกรรมระบบ */
 let tasks = load('tasks', [
   { id: 1, title: 'ไปส่งมดแดง', time: '07:00', date: '2026-09-01', repeat: 'everyday' },
   { id: 2, title: 'เช็คน้ำมันก่อนวิ่งงาน', time: '10:00', date: '2026-09-20', repeat: 'once' },
@@ -541,6 +572,7 @@ let dailyCompletions = load('dailyCompletions', {
   '2026-09-24': [1]
 });
 
+let isSubscribed = load('isSubscribed', false);
 let filter = 'all';
 let editingId = null;
 let selectedCalendarDate = getTodayStr();
@@ -557,13 +589,54 @@ function setTheme(t) {
 setTheme(load('theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 $('#theme').onclick = () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
 
-/* ---------- นาฬิกา ---------- */
+/* ---------- นาฬิกาและจำลอง Health Check ---------- */
 function tick() {
   const d = new Date();
   $('#clock').textContent = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   $('#date').textContent = d.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 }
 tick(); setInterval(tick, 1000);
+
+/* จัดการปุ่มจำลอง Push & Service Worker */
+function updateSubButton() {
+  const btn = $('#subBtn');
+  if (isSubscribed) {
+    btn.textContent = 'ยกเลิก Push (unsubscribe)';
+    btn.style.background = 'var(--danger)';
+  } else {
+    btn.textContent = 'สมัครรับ Push (subscribe)';
+    btn.style.background = 'var(--accent)';
+  }
+}
+updateSubButton();
+
+$('#subBtn').onclick = () => {
+  isSubscribed = !isSubscribed;
+  save('isSubscribed', isSubscribed);
+  updateSubButton();
+  alert(isSubscribed ? 'จำลองการส่งข้อมูล Subscription ไปยัง Server (subscribe.js) สำเร็จ' : 'ยกเลิกการสมัครรับแจ้งเตือนแล้ว (unsubscribe.js)');
+};
+
+$('#pushTestBtn').onclick = () => {
+  if (!isSubscribed) {
+    alert('กรุณากด "สมัครรับ Push" ก่อนทดสอบการแจ้งเตือน');
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    new Notification('Test Notification (Web Push service)', {
+      body: 'การทดสอบส่งแจ้งเตือนจากระบบจำลองทำงานปกติ',
+      icon: 'https://www.gstatic.com/images/branding/product/2x/googleg_96dp.png'
+    });
+  } else if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        new Notification('Test Notification', { body: 'เปิดใช้งานการแจ้งเตือนสำเร็จ!' });
+      }
+    });
+  } else {
+    alert('เบราว์เซอร์ถูกบล็อกการแจ้งเตือน กรุณาปลดล็อคในการตั้งค่าเว็บไซต์');
+  }
+};
 
 /* ---------- ค้นหาด้วย / ---------- */
 document.addEventListener('keydown', e => {
@@ -631,7 +704,7 @@ $('#linkForm').addEventListener('submit', e => {
   save('links', links); renderLinks(); dlg.close();
 });
 
-/* ---------- ระบบ Todo & ปฏิทิน ---------- */
+/* ---------- ระบบ Todo & ปฏิทิน (อ้างอิง Application data access / store.js) ---------- */
 function toggleRepeatEnd() {
   const repeat = $('#todoRepeat').value;
   $('#repeatEndWrap').style.display = (repeat === 'once') ? 'none' : 'block';
@@ -833,7 +906,7 @@ function addOrUpdateTask(e) {
       task.repeatEnd = repeatEnd;
     }
     editingId = null;
-    $('#submitTaskBtn').textContent = 'เพิ่มภารกิจ';
+    $('#submitTaskBtn').textContent = 'เพิ่มภารกิจ (tasks.js)';
   } else {
     const newTask = {
       id: Date.now(),
