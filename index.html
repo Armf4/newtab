@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Task & Subscription App (Todo List Architecture)</title>
+<title>Task & Subscription App (Integrated Dashboard)</title>
 <style>
 :root {
   --bg: #e4ebf5;
@@ -182,7 +182,7 @@ h2{
 }
 .count{font-weight:400;color:var(--mute);font-size:14px}
 
-/* System Status Bar (ตามไดอะแกรมส่วน Health / Service Worker) */
+/* System Status Bar */
 .system-status {
   display: flex;
   gap: 12px;
@@ -295,9 +295,6 @@ h2{
 .tile:hover{
   transform:translateY(-2px);
   box-shadow: 7px 7px 14px var(--shadow-dark), -7px -7px 14px var(--shadow-light);
-}
-.tile:active{
-  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
 }
 .ico{
   width:42px;
@@ -417,6 +414,30 @@ li .edit-btn:hover, li .del-btn:hover{background:var(--line);color:var(--danger)
 .foot button{border:0;background:transparent;color:var(--mute);text-decoration:underline;cursor:pointer}
 .empty{color:var(--mute);padding:14px 4px;text-align:center}
 
+/* Dashboard Metrics & Progress Bars (ผสานจากไฟล์ที่สอง) */
+.stat-card {
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+  border: 1px solid var(--line);
+}
+.stat-bar-bg {
+  width: 100%;
+  background: var(--panel);
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+  margin-top: 8px;
+}
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
 dialog{
   border:1px solid var(--line);
   border-radius:16px;
@@ -472,11 +493,10 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 
   <main>
     <div class="left-column">
-      <!-- ส่วน Todo และจำลอง Push Subscription ตามสถาปัตยกรรมระบบ -->
+      <!-- ส่วน Todo และจำลอง Push Subscription -->
       <section class="todo" aria-label="รายการงาน">
         <h2>Task & Subscription UI <span class="count" id="count"></span></h2>
         
-        <!--จำลองสถานะ Health / Service Worker-->
         <div class="system-status">
           <div class="status-indicator">
             <span class="dot"></span>
@@ -520,16 +540,65 @@ dialog input:focus{outline:0;border-color:var(--accent)}
       </section>
     </div>
 
-    <!-- ปฏิทินแสดงผลจำลองตารางเวลา (Task scheduling rules) -->
-    <section aria-label="ปฏิทิน">
-      <div class="calendar-header">
-        <button type="button" id="prevMonth" aria-label="เดือนก่อนหน้า">&lt;</button>
-        <h3 id="calTitle" style="margin:0;font-size:16px;font-weight:600;"></h3>
-        <button type="button" id="nextMonth" aria-label="เดือนถัดไป">&gt;</button>
-      </div>
-      <div class="calendar-grid" id="calGrid"></div>
-      <div id="selectedDateSummary" style="margin-top: 16px; font-size: 13px; color: var(--mute);"></div>
-    </section>
+    <!-- คอลัมน์ขวา: ปฏิทิน + แดชบอร์ดความสำเร็จขั้นสูง (ผสมจากไฟล์ที่สอง) -->
+    <div style="display: flex; flex-direction: column; gap: 32px;">
+      <section aria-label="ปฏิทิน">
+        <div class="calendar-header">
+          <button type="button" id="prevMonth" aria-label="เดือนก่อนหน้า">&lt;</button>
+          <h3 id="calTitle" style="margin:0;font-size:16px;font-weight:600;"></h3>
+          <button type="button" id="nextMonth" aria-label="เดือนถัดไป">&gt;</button>
+        </div>
+        <div class="calendar-grid" id="calGrid"></div>
+        <div id="selectedDateSummary" style="margin-top: 16px; font-size: 13px; color: var(--mute);"></div>
+      </section>
+
+      <!-- แดชบอร์ดความสำเร็จ (นำเข้าจาก Metodo Dashboard) -->
+      <section aria-label="แดชบอร์ดความสำเร็จ">
+        <h2>แดชบอร์ดความสำเร็จ</h2>
+        
+        <div class="stat-card">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+            <span>ความสำเร็จรายวัน (Daily)</span>
+            <span id="stat-daily-val" style="color: var(--accent);">0%</span>
+          </div>
+          <div class="stat-bar-bg">
+            <div id="stat-daily-bar" class="stat-bar-fill" style="width: 0%; background: var(--success);"></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+            <span id="stat-monthly-label">ความสำเร็จรายเดือน</span>
+            <span id="stat-monthly-val" style="color: var(--accent);">0%</span>
+          </div>
+          <div class="stat-bar-bg">
+            <div id="stat-monthly-bar" class="stat-bar-fill" style="width: 0%; background: var(--accent);"></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+            <span>ความสำเร็จรายปี (Yearly - 2026)</span>
+            <span id="stat-yearly-val" style="color: var(--accent);">0%</span>
+          </div>
+          <div class="stat-bar-bg">
+            <div id="stat-yearly-bar" class="stat-bar-fill" style="width: 0%; background: var(--warning);"></div>
+          </div>
+        </div>
+
+        <!-- รายละเอียดความคืบหน้ารายเดือนแบบไล่ระดับ -->
+        <div style="margin-top: 16px;">
+          <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--mute); margin-bottom: 10px;">ความคืบหน้ารายเดือน (ภาพรวมทั้งปี)</h3>
+          <div id="yearly-monthly-bars" style="display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 4px;">
+            <!-- เรนเดอร์ด้วย JavaScript -->
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; padding: 12px; border-radius: 12px; background: var(--panel); box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); text-align: center; font-size: 12px; color: var(--mute);">
+          <p style="margin: 0 0 4px 0;">"fc เอ็มออนิว"</p>
+        </div>
+      </section>
+    </div>
   </main>
 </div>
 
@@ -559,7 +628,9 @@ const getTodayStr = () => {
   return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
 };
 
-/* ข้อมูลเริ่มต้นที่สอดคล้องกับสถาปัตยกรรมระบบ */
+const THAI_MONTHS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+const EN_MONTHS_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 let tasks = load('tasks', [
   { id: 1, title: 'ไปส่งมดแดง', time: '07:00', date: '2026-09-01', repeat: 'everyday' },
   { id: 2, title: 'เช็คน้ำมันก่อนวิ่งงาน', time: '10:00', date: '2026-09-20', repeat: 'once' },
@@ -569,7 +640,8 @@ let tasks = load('tasks', [
 
 let dailyCompletions = load('dailyCompletions', {
   '2026-09-20': [1],
-  '2026-09-24': [1]
+  '2026-09-24': [1],
+  '2026-08-15': [1, 3]
 });
 
 let isSubscribed = load('isSubscribed', false);
@@ -589,7 +661,7 @@ function setTheme(t) {
 setTheme(load('theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 $('#theme').onclick = () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
 
-/* ---------- นาฬิกาและจำลอง Health Check ---------- */
+/* ---------- นาฬิกาและ Health Check ---------- */
 function tick() {
   const d = new Date();
   $('#clock').textContent = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -597,7 +669,6 @@ function tick() {
 }
 tick(); setInterval(tick, 1000);
 
-/* จัดการปุ่มจำลอง Push & Service Worker */
 function updateSubButton() {
   const btn = $('#subBtn');
   if (isSubscribed) {
@@ -614,7 +685,7 @@ $('#subBtn').onclick = () => {
   isSubscribed = !isSubscribed;
   save('isSubscribed', isSubscribed);
   updateSubButton();
-  alert(isSubscribed ? 'จำลองการส่งข้อมูล Subscription ไปยัง Server (subscribe.js) สำเร็จ' : 'ยกเลิกการสมัครรับแจ้งเตือนแล้ว (unsubscribe.js)');
+  alert(isSubscribed ? 'จำลองการส่งข้อมูล Subscription สำเร็จ' : 'ยกเลิกการสมัครรับแจ้งเตือนแล้ว');
 };
 
 $('#pushTestBtn').onclick = () => {
@@ -638,7 +709,6 @@ $('#pushTestBtn').onclick = () => {
   }
 };
 
-/* ---------- ค้นหาด้วย / ---------- */
 document.addEventListener('keydown', e => {
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if (e.key === '/' && !typing && !$('#dlg').open) { e.preventDefault(); $('#q').focus(); }
@@ -704,7 +774,7 @@ $('#linkForm').addEventListener('submit', e => {
   save('links', links); renderLinks(); dlg.close();
 });
 
-/* ---------- ระบบ Todo & ปฏิทิน (อ้างอิง Application data access / store.js) ---------- */
+/* ---------- ระบบ Todo & ปฏิทิน ---------- */
 function toggleRepeatEnd() {
   const repeat = $('#todoRepeat').value;
   $('#repeatEndWrap').style.display = (repeat === 'once') ? 'none' : 'block';
@@ -747,8 +817,7 @@ function toggleTaskForDate(taskId, dateStr) {
     dailyCompletions[dateStr].push(taskId);
   }
   persist();
-  renderTodos();
-  renderCalendar();
+  renderAll();
 }
 
 const persist = () => {
@@ -765,7 +834,6 @@ function renderCalendar() {
   const year = calDate.getFullYear();
   const month = calDate.getMonth();
 
-  const THAI_MONTHS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
   $('#calTitle').textContent = `${THAI_MONTHS[month]} ${year + 543}`;
 
   ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'].forEach(w => {
@@ -804,8 +872,7 @@ function renderCalendar() {
 
     dayDiv.onclick = () => {
       selectedCalendarDate = currStr;
-      renderCalendar();
-      renderTodos();
+      renderAll();
     };
 
     grid.appendChild(dayDiv);
@@ -817,6 +884,89 @@ function renderCalendar() {
 
 $('#prevMonth').onclick = () => { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); };
 $('#nextMonth').onclick = () => { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); };
+
+/* ---------- แดชบอร์ดความสำเร็จขั้นสูง (ผสมจากไฟล์ที่สอง) ---------- */
+function renderStatsDashboard() {
+  const todayStr = getTodayStr();
+  const todayTasks = getTasksForDate(todayStr);
+  const todayCompleted = todayTasks.filter(t => isTaskCompletedOnDate(t.id, todayStr)).length;
+  const dailyPct = todayTasks.length > 0 ? Math.round((todayCompleted / todayTasks.length) * 100) : 0;
+
+  $('#stat-daily-val').textContent = `${dailyPct}%`;
+  $('#stat-daily-bar').style.width = `${dailyPct}%`;
+
+  const nowStats = new Date();
+  const statsYear = nowStats.getFullYear();
+  const statsMonthStr = pad2(nowStats.getMonth() + 1);
+  $('#stat-monthly-label').textContent = `ความสำเร็จรายเดือน (${EN_MONTHS_ABBR[nowStats.getMonth()]} ${statsYear})`;
+
+  let totalMonthTasks = 0;
+  let completedMonthTasks = 0;
+  for (let i = 1; i <= 31; i++) {
+    const dStr = `${statsYear}-${statsMonthStr}-${String(i).padStart(2, '0')}`;
+    const dayTasks = getTasksForDate(dStr);
+    totalMonthTasks += dayTasks.length;
+    dayTasks.forEach(t => {
+      if (isTaskCompletedOnDate(t.id, dStr)) completedMonthTasks++;
+    });
+  }
+  const monthlyPct = totalMonthTasks > 0 ? Math.round((completedMonthTasks / totalMonthTasks) * 100) : 0;
+  $('#stat-monthly-val').textContent = `${monthlyPct}%`;
+  $('#stat-monthly-bar').style.width = `${monthlyPct}%`;
+
+  let totalYearTasks = 0;
+  let completedYearTasks = 0;
+  for (let m = 1; m <= 12; m++) {
+    const mStrNum = String(m).padStart(2, '0');
+    for (let d = 1; d <= 31; d++) {
+      const dStr = `${statsYear}-${mStrNum}-${String(d).padStart(2, '0')}`;
+      const dayTasks = getTasksForDate(dStr);
+      totalYearTasks += dayTasks.length;
+      dayTasks.forEach(t => {
+        if (isTaskCompletedOnDate(t.id, dStr)) completedYearTasks++;
+      });
+    }
+  }
+  const yearlyPct = totalYearTasks > 0 ? Math.min(100, Math.round((completedYearTasks / totalYearTasks) * 100)) : 0;
+  $('#stat-yearly-val').textContent = `${yearlyPct}%`;
+  $('#stat-yearly-bar').style.width = `${yearlyPct}%`;
+
+  // แถบรายเดือนทั้ง 12 เดือน (ตาม Metodo)
+  const monthlyContainer = $('#yearly-monthly-bars');
+  monthlyContainer.textContent = '';
+  THAI_MONTHS.forEach((mName, idx) => {
+    const monthStrNum = String(idx + 1).padStart(2, '0');
+    let mTotal = 0;
+    let mDone = 0;
+    for (let d = 1; d <= 31; d++) {
+      const dStr = `${statsYear}-${monthStrNum}-${String(d).padStart(2, '0')}`;
+      const dTasks = getTasksForDate(dStr);
+      mTotal += dTasks.length;
+      dTasks.forEach(t => {
+        if (isTaskCompletedOnDate(t.id, dStr)) mDone++;
+      });
+    }
+    const pct = mTotal > 0 ? Math.round((mDone / mTotal) * 100) : 0;
+
+    let barColor = 'var(--accent)';
+    if (pct >= 70) barColor = 'var(--success)';
+    else if (pct >= 40) barColor = 'var(--warning)';
+    else if (pct > 0) barColor = 'var(--danger)';
+
+    const item = document.createElement('div');
+    item.style.cssText = 'background: var(--panel); padding: 12px; border-radius: 12px; box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); border: 1px solid var(--line);';
+    item.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px;">
+        <span style="font-weight: 650;">${mName}</span>
+        <span style="font-size: 11px; color: var(--mute);">สำเร็จ ${mDone}/${mTotal} (${pct}%)</span>
+      </div>
+      <div style="width: 100%; background: var(--panel); height: 8px; border-radius: 4px; overflow: hidden; box-shadow: inset 1px 1px 3px var(--shadow-dark), inset -1px -1px 3px var(--shadow-light);">
+        <div style="height: 100%; width: ${pct}%; background: ${barColor}; border-radius: 4px; transition: width 0.4s;"></div>
+      </div>
+    `;
+    monthlyContainer.appendChild(item);
+  });
+}
 
 /* ---------- เรนเดอร์รายการ Todo ---------- */
 function renderTodos() {
@@ -871,8 +1021,7 @@ function renderTodos() {
     del.onclick = () => {
       tasks = tasks.filter(x => x.id !== t.id);
       persist();
-      renderTodos();
-      renderCalendar();
+      renderAll();
     };
 
     li.append(cb, contentDiv, editBtn, del);
@@ -883,7 +1032,6 @@ function renderTodos() {
   $('#count').textContent = total ? `${completedCount}/${total}` : '';
   $('#left').textContent = total ? `สำเร็จ ${completedCount} จาก ${total} งาน` : 'ไม่มีภารกิจ';
   $('#clearDone').style.display = completedCount > 0 ? '' : 'none';
-  renderCalendar();
 }
 
 function addOrUpdateTask(e) {
@@ -923,7 +1071,7 @@ function addOrUpdateTask(e) {
   $('#todoRepeatEnd').value = '';
   $('#repeatEndWrap').style.display = 'none';
   persist();
-  renderTodos();
+  renderAll();
 }
 
 function startEditTask(id) {
@@ -948,7 +1096,7 @@ $('#clearDone').onclick = () => {
       toggleTaskForDate(t.id, targetDate);
     }
   });
-  renderTodos();
+  renderAll();
 };
 
 $('#filters').onclick = e => {
@@ -958,9 +1106,14 @@ $('#filters').onclick = e => {
   renderTodos();
 };
 
+function renderAll() {
+  renderTodos();
+  renderCalendar();
+  renderStatsDashboard();
+}
+
 renderLinks();
-renderTodos();
-renderCalendar();
+renderAll();
 </script>
 </body>
 </html>
