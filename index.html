@@ -49,15 +49,17 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.wrap{max-width:1180px;margin:0 auto;padding:40px 32px 48px}
+.wrap{max-width:2000px;margin:0 auto;padding:16px 28px 114px;height:100vh;height:100dvh;display:flex;flex-direction:column}
+header{flex-shrink:0}
+form.search{flex-shrink:0;width:100%}
 
 header{
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 16px;
-  margin-bottom: 32px;
+  gap: 0;
+  margin-bottom: 10px;
   position: relative;
 }
 .header-actions {
@@ -85,31 +87,28 @@ header{
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 48px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  box-shadow: 8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
 }
 .clock{
-  font-size: 64px;
+  font-size: 44px;
   font-weight: 300;
   letter-spacing: -.02em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  text-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
 }
 .date{
   color: var(--mute);
-  margin-top: 8px;
+  margin-top: 4px;
+  font-size: 13px;
   font-weight: 500;
 }
 
 form.search{
   max-width: 700px;
-  margin: 0 auto 36px auto;
+  margin: 0 auto 24px auto;
   display: flex;
   background: var(--panel);
   border: 1px solid var(--line);
@@ -121,8 +120,8 @@ form.search{
   flex: 1;
   border: 0;
   background: transparent;
-  padding: 18px 22px;
-  font-size: 18px;
+  padding: 13px 20px;
+  font-size: 16px;
   outline: 0;
   min-width: 0;
 }
@@ -151,17 +150,20 @@ form.search{
 
 main{
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 32px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 2fr);
+  gap: 24px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
 }
 
 .left-column{
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 28px;
 }
 
+main > section{height:100%;min-height:0;overflow-y:auto}
 section{
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
@@ -232,7 +234,7 @@ h2{
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 8px;
   text-align: center;
 }
 .calendar-weekday {
@@ -242,7 +244,7 @@ h2{
   padding-bottom: 6px;
 }
 .calendar-day {
-  aspect-ratio: 1;
+  aspect-ratio: 1.8;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -277,7 +279,6 @@ h2{
 }
 
 /* Tiles */
-.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:14px}
 .tile{
   position:relative;
   display:flex;
@@ -335,6 +336,32 @@ h2{
   box-shadow: inset 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
 }
 .add-tile b{font-size:24px;font-weight:300;line-height:1}
+
+/* แถบทางลัดด้านล่าง */
+.dock{
+  position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:10;
+  display:flex;align-items:center;gap:6px;
+  max-width:calc(100vw - 32px);overflow-x:auto;
+  padding:8px 12px;
+  background:var(--glass-bg);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:22px;
+  box-shadow:8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+}
+.dock .tile{
+  flex:0 0 auto;min-width:68px;padding:7px 10px 5px;gap:4px;
+  background:transparent;box-shadow:none;border-radius:14px;
+}
+.dock .tile:hover{background:var(--line);transform:translateY(-3px);box-shadow:none}
+.dock .ico{width:36px;height:36px;font-size:16px}
+.dock .tile span.n{font-size:11px;color:var(--mute);max-width:64px}
+.dock .tile .del{top:1px;right:1px;width:18px;height:18px;font-size:13px}
+.dock .add-tile{
+  flex:0 0 auto;min-height:0;min-width:68px;padding:11px 10px;
+  border:1px dashed var(--line);box-shadow:none;background:transparent;
+}
+.dock .add-tile:hover{background:var(--line);transform:none}
+.dock .add-tile b{font-size:20px}
 
 /* Todo / List */
 .todo input[type=text], .todo input[type=date], .todo select, .todo input[type=time]{
@@ -463,13 +490,35 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
 
 @media (max-width:900px){
-  main{grid-template-columns:1fr}
-  .clock{font-size:48px}
-  .wrap{padding:24px 16px}
+  main{grid-template-columns:1fr;flex:none}
+  main > section{height:auto;overflow:visible}
+  .clock{font-size:38px}
+  .wrap{padding:14px 16px 114px;height:auto;display:block}
   .header-actions{position:static;margin-bottom:12px;justify-content:center}
   header{align-items:stretch}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ปุ่มเปลี่ยนสี */
+.color-btn{
+  width:34px;height:34px;padding:0;border:none;border-radius:50%;
+  background:var(--panel);display:grid;place-items:center;
+  box-shadow:4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+}
+.color-btn i{display:block;width:16px;height:16px;border-radius:50%;background:var(--accent)}
+.color-pop{
+  position:absolute;top:calc(100% + 8px);right:0;z-index:20;
+  display:flex;gap:8px;padding:10px 12px;
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  box-shadow:6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+}
+.color-pop[hidden]{display:none}
+.color-pop button{
+  width:22px;height:22px;padding:0;border-radius:50%;
+  border:2px solid transparent;
+}
+.color-pop button.on{border-color:var(--ink)}
+.header-actions{align-items:center}
 
 /* Agenda (รายการของวันที่เลือก) */
 .agenda{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
@@ -492,6 +541,8 @@ dialog input:focus{outline:0;border-color:var(--accent)}
     <div class="header-actions">
       <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบ Push</button>
       <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
+      <button class="color-btn" id="colorBtn" type="button" title="เปลี่ยนสี" aria-label="เปลี่ยนสีหลัก"><i></i></button>
+      <div class="color-pop" id="colorPop" hidden></div>
     </div>
     <div class="clock-container">
       <div class="clock" id="clock">00:00</div>
@@ -506,68 +557,8 @@ dialog input:focus{outline:0;border-color:var(--accent)}
   </form>
 
   <main>
-    <div class="left-column">
-      <!-- ส่วนภารกิจ -->
-      <section class="todo" aria-label="รายการงาน">
-        <h2>ภารกิจของฉัน <span class="count" id="count"></span></h2>
-        
-        <div class="system-status">
-          <div class="status-indicator">
-            <span class="dot" id="statusDot"></span>
-            <span id="healthStatus">แจ้งเตือน: ปิดอยู่</span>
-          </div>
-          <button type="button" id="subBtn" style="border:0;background:var(--accent);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;">เปิดแจ้งเตือน</button>
-        </div>
-        
-        <form id="todoForm" onsubmit="addOrUpdateTask(event)">
-          <input type="text" id="todoInput" placeholder="ชื่อภารกิจ เช่น ไปส่งมดแดง..." maxlength="200" required aria-label="เพิ่มงานใหม่">
-          <div style="display:flex; gap:8px;">
-            <input type="date" id="todoDate" aria-label="วันที่เริ่มต้น" style="flex:1">
-            <input type="time" id="todoTime" value="09:00" aria-label="เวลา" style="flex:0 0 110px">
-          </div>
-          <select id="todoRepeat" onchange="toggleRepeatEnd()">
-            <option value="once">ทำครั้งเดียว (เฉพาะวันที่เลือก)</option>
-            <option value="everyday">ทุกวัน</option>
-            <option value="weekly">รายสัปดาห์</option>
-          </select>
-          <div id="repeatEndWrap" style="display:none; margin-bottom:8px;">
-            <label style="font-size:11px; color:var(--mute); margin-bottom:2px;">วันที่สิ้นสุดการทำซ้ำ (ไม่บังคับ)</label>
-            <input type="date" id="todoRepeatEnd">
-          </div>
-          <button class="btn" type="submit" id="submitTaskBtn" style="width:100%">เพิ่มภารกิจ</button>
-        </form>
-
-        <div class="filters" id="filters" style="margin-top:14px;">
-          <button type="button" data-f="all" aria-pressed="true">ทั้งหมด</button>
-          <button type="button" data-f="active" aria-pressed="false">ยังไม่เสร็จ</button>
-          <button type="button" data-f="done" aria-pressed="false">เสร็จแล้ว</button>
-        </div>
-
-        <ul id="list"></ul>
-        <div class="foot"><span id="left"></span><button type="button" id="clearDone">ลบที่เสร็จแล้ว</button></div>
-      </section>
-
-      <!-- ทางลัด -->
-      <section>
-        <h2>ทางลัดเว็บไซต์</h2>
-        <div class="tiles" id="tiles"></div>
-      </section>
-    </div>
-
-    <!-- คอลัมน์ขวา: ปฏิทิน + แดชบอร์ด -->
-    <div style="display: flex; flex-direction: column; gap: 32px;">
-      <section aria-label="ปฏิทิน">
-        <div class="calendar-header">
-          <button type="button" id="prevMonth" aria-label="เดือนก่อนหน้า">&lt;</button>
-          <h3 id="calTitle" style="margin:0;font-size:16px;font-weight:600;"></h3>
-          <button type="button" id="nextMonth" aria-label="เดือนถัดไป">&gt;</button>
-        </div>
-        <div class="calendar-grid" id="calGrid"></div>
-        <div id="selectedDateSummary" class="agenda"></div>
-      </section>
-
-      <!-- แดชบอร์ดความสำเร็จ -->
-      <section aria-label="แดชบอร์ดความสำเร็จ">
+    <!-- 1) แดชบอร์ด -->
+    <section aria-label="แดชบอร์ดความสำเร็จ">
         <h2>แดชบอร์ดความสำเร็จ</h2>
         
         <div class="stat-card">
@@ -603,7 +594,7 @@ dialog input:focus{outline:0;border-color:var(--accent)}
         <!-- รายละเอียดความคืบหน้ารายเดือนแบบไล่ระดับ -->
         <div style="margin-top: 16px;">
           <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--mute); margin-bottom: 10px;">ความคืบหน้ารายเดือน (ภาพรวมทั้งปี)</h3>
-          <div id="yearly-monthly-bars" style="display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 4px;">
+          <div id="yearly-monthly-bars" style="display: flex; flex-direction: column; gap: 10px; ">
             <!-- เรนเดอร์ด้วย JavaScript -->
           </div>
         </div>
@@ -612,8 +603,61 @@ dialog input:focus{outline:0;border-color:var(--accent)}
           <p style="margin: 0 0 4px 0;">"fc เอ็มออนิว"</p>
         </div>
       </section>
-    </div>
+
+    <!-- 2) รายการที่ต้องทำ -->
+    <section class="todo" aria-label="รายการงาน">
+        <h2>ภารกิจของฉัน <span class="count" id="count"></span></h2>
+        
+        <div class="system-status">
+          <div class="status-indicator">
+            <span class="dot" id="statusDot"></span>
+            <span id="healthStatus">แจ้งเตือน: ปิดอยู่</span>
+          </div>
+          <button type="button" id="subBtn" style="border:0;background:var(--accent);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;">เปิดแจ้งเตือน</button>
+        </div>
+        
+        <form id="todoForm" onsubmit="addOrUpdateTask(event)">
+          <input type="text" id="todoInput" placeholder="ชื่อภารกิจ เช่น ไปส่งมดแดง..." maxlength="200" required aria-label="เพิ่มงานใหม่">
+          <div style="display:flex; gap:8px;">
+            <input type="date" id="todoDate" aria-label="วันที่เริ่มต้น" style="flex:1; min-width:0">
+            <input type="time" id="todoTime" value="09:00" aria-label="เวลา" style="flex:0 0 132px; min-width:0">
+          </div>
+          <select id="todoRepeat" onchange="toggleRepeatEnd()">
+            <option value="once">ทำครั้งเดียว (เฉพาะวันที่เลือก)</option>
+            <option value="everyday">ทุกวัน</option>
+            <option value="weekly">รายสัปดาห์</option>
+          </select>
+          <div id="repeatEndWrap" style="display:none; margin-bottom:8px;">
+            <label style="font-size:11px; color:var(--mute); margin-bottom:2px;">วันที่สิ้นสุดการทำซ้ำ (ไม่บังคับ)</label>
+            <input type="date" id="todoRepeatEnd">
+          </div>
+          <button class="btn" type="submit" id="submitTaskBtn" style="width:100%">เพิ่มภารกิจ</button>
+        </form>
+
+        <div class="filters" id="filters" style="margin-top:14px;">
+          <button type="button" data-f="all" aria-pressed="true">ทั้งหมด</button>
+          <button type="button" data-f="active" aria-pressed="false">ยังไม่เสร็จ</button>
+          <button type="button" data-f="done" aria-pressed="false">เสร็จแล้ว</button>
+        </div>
+
+        <ul id="list"></ul>
+        <div class="foot"><span id="left"></span><button type="button" id="clearDone">ลบที่เสร็จแล้ว</button></div>
+      </section>
+
+    <!-- 3) ปฏิทิน -->
+    <section aria-label="ปฏิทิน">
+        <div class="calendar-header">
+          <button type="button" id="prevMonth" aria-label="เดือนก่อนหน้า">&lt;</button>
+          <h3 id="calTitle" style="margin:0;font-size:16px;font-weight:600;"></h3>
+          <button type="button" id="nextMonth" aria-label="เดือนถัดไป">&gt;</button>
+        </div>
+        <div class="calendar-grid" id="calGrid"></div>
+        <div id="selectedDateSummary" class="agenda"></div>
+      </section>
   </main>
+
+  <!-- แถบทางลัดด้านล่าง (เหมือน task bar) -->
+  <nav class="dock" id="tiles" aria-label="ทางลัดเว็บไซต์"></nav>
 </div>
 
 <dialog id="dlg">
@@ -672,6 +716,25 @@ function setTheme(t) {
 }
 setTheme(load('theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 $('#theme').onclick = () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
+
+/* ---------- เปลี่ยนสีหลัก ---------- */
+const ACCENTS = ['#8B5CF6', '#3B82F6', '#14B8A6', '#22C55E', '#F97316', '#EC4899', '#EF4444'];
+function setAccent(c) {
+  root.style.setProperty('--accent', c);
+  save('accent', c);
+  document.querySelectorAll('#colorPop button').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+}
+ACCENTS.forEach(c => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.dataset.c = c; b.style.background = c;
+  b.setAttribute('aria-label', 'สี ' + c);
+  b.onclick = () => setAccent(c);
+  $('#colorPop').appendChild(b);
+});
+setAccent(load('accent', ACCENTS[0]));
+$('#colorBtn').onclick = e => { e.stopPropagation(); $('#colorPop').hidden = !$('#colorPop').hidden; };
+document.addEventListener('click', e => { if (!e.target.closest('#colorPop')) $('#colorPop').hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#colorPop').hidden = true; });
 
 /* ---------- นาฬิกาและการแจ้งเตือน ---------- */
 function tick() {
