@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>หน้าเริ่มต้น</title>
+<style>
+:root {
+  --bg: #e4ebf5;
+  --panel: #e4ebf5;
+  --ink: #333333;
+  --mute: #6b7c93;
+  --line: #c5d1e8;
+  --accent: #8B5CF6;
+  --accent-ink: #ffffff;
+  --danger: #ef4444;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --shadow-light: #ffffff;
+  --shadow-dark: #c5d1e8;
+  --glass-bg: rgba(228, 235, 245, 0.85);
+}
+:root[data-theme=dark] {
+  --bg: #12141c;
+  --panel: #12141c;
+  --ink: #e2e8f0;
+  --mute: #94a3b8;
+  --line: #1f2330;
+  --accent: #8B5CF6;
+  --accent-ink: #ffffff;
+  --danger: #f87171;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --shadow-light: #1a1d28;
+  --shadow-dark: #0a0b10;
+  --glass-bg: rgba(18, 20, 28, 0.85);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  transition: background 0.3s, color 0.3s;
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:40px 32px 48px}
+
+header{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  position: relative;
+}
+.theme-btn{
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: none;
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 10px 18px;
+  box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+  transition: all 0.2s;
+  font-weight: 500;
+}
+.theme-btn:active{
+  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+}
+
+.clock-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 48px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: 8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+}
+.clock{
+  font-size: 64px;
+  font-weight: 300;
+  letter-spacing: -.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
+}
+.date{
+  color: var(--mute);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+form.search{
+  max-width: 700px;
+  margin: 0 auto 36px auto;
+  display: flex;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+}
+.search input{
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: 18px 22px;
+  font-size: 18px;
+  outline: 0;
+  min-width: 0;
+}
+.search input::placeholder{color: var(--mute)}
+.search kbd{
+  align-self: center;
+  margin-right: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 8px;
+  color: var(--mute);
+  font-size: 13px;
+  box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
+}
+.search button{
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 0 28px;
+  font-weight: 500;
+  border-radius: 0 16px 16px 0;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
+  transition: opacity 0.2s;
+}
+.search button:hover{opacity: 0.9}
+
+main{
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  align-items: start;
+}
+
+.left-column{
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+section{
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+}
+
+h2{
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.count{font-weight:400;color:var(--mute);font-size:14px}
+
+/* Calendar Widget Styles */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.calendar-header button {
+  background: var(--panel);
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+  font-weight: bold;
+}
+.calendar-header button:active {
+  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  text-align: center;
+}
+.calendar-weekday {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mute);
+  padding-bottom: 6px;
+}
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--panel);
+  box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+  transition: all 0.15s;
+  position: relative;
+}
+.calendar-day:hover {
+  color: var(--accent);
+}
+.calendar-day.empty {
+  background: transparent;
+  box-shadow: none;
+  cursor: default;
+}
+.calendar-day.today {
+  border: 1.5px solid var(--accent);
+  font-weight: 600;
+}
+.calendar-day.has-event::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background-color: var(--accent);
+  border-radius: 50%;
+  margin-top: 2px;
+}
+
+/* Tiles / Shortcuts */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:14px}
+.tile{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  padding:18px 8px 14px;
+  background: var(--panel);
+  border-radius: 14px;
+  text-decoration:none;
+  color:var(--ink);
+  box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+  transition: transform .15s, box-shadow .15s;
+}
+.tile:hover{
+  transform:translateY(-2px);
+  box-shadow: 7px 7px 14px var(--shadow-dark), -7px -7px 14px var(--shadow-light);
+}
+.tile:active{
+  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+}
+.ico{
+  width:42px;
+  height:42px;
+  border-radius:11px;
+  display:grid;
+  place-items:center;
+  font-weight:600;
+  font-size:18px;
+  color:#fff;
+  overflow:hidden;
+  background:#fff;
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1);
+}
+.ico span{font-size:16px}
+.tile span.n{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:500}
+.tile .del{
+  position:absolute;
+  top:5px;right:5px;
+  width:22px;height:22px;
+  border:0;border-radius:6px;
+  background:transparent;
+  color:var(--mute);
+  opacity:0;
+  font-size:15px;
+  line-height:1;
+}
+.tile:hover .del,.tile .del:focus-visible{opacity:1}
+.del:hover{background:var(--line);color:var(--danger)}
+.add-tile{
+  border-style:dashed;
+  background:transparent;
+  color:var(--mute);
+  justify-content:center;
+  min-height:102px;
+  font-size:13px;
+  cursor:pointer;
+  box-shadow: inset 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+}
+.add-tile b{font-size:24px;font-weight:300;line-height:1}
+
+/* Todo / List */
+.neu-pressed {
+  background: var(--panel);
+  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+}
+.neu-btn {
+  background: var(--panel);
+  box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+}
+.neu-btn:active {
+  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+}
+
+.todo input[type=text], .todo input[type=date], .todo select{
+  width:100%;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+  outline: 0;
+  margin-bottom: 8px;
+}
+.todo input[type=text]:focus, .todo input[type=date]:focus, .todo select:focus{
+  border-color: var(--accent);
+}
+
+.btn{
+  border:0;
+  background:var(--accent);
+  color:var(--accent-ink);
+  border-radius:10px;
+  padding:10px 18px;
+  font-weight:500;
+  box-shadow: 4px 4px 10px rgba(0,0,0,0.1);
+}
+.btn.ghost{
+  background:var(--panel);
+  color:var(--ink);
+  border:1px solid var(--line);
+  box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+}
+
+.filters{display:flex;gap:6px;margin-bottom:12px}
+.filters button{
+  border:0;
+  background:var(--panel);
+  border-radius:8px;
+  padding:6px 14px;
+  color:var(--mute);
+  box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+  font-size:13px;
+}
+.filters button[aria-pressed=true]{
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight:600;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+ul{list-style:none;margin:0;padding:0;max-height:45vh;overflow:auto}
+li{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 8px;
+  border-bottom: 1px solid var(--line);
+}
+li input[type=checkbox]{
+  width:18px;height:18px;
+  accent-color:var(--accent);
+  flex:none;cursor:pointer;
+}
+li .t-content{display:flex;flex-direction:column;flex:1;min-width:0}
+li .t{word-break:break-word;cursor:text;font-size:14px}
+li .t-meta{font-size:11px;color:var(--mute);display:flex;gap:8px;margin-top:2px}
+li.done .t{text-decoration:line-through;color:var(--mute)}
+li .edit-btn, li .del-btn{
+  border:0;background:transparent;
+  color:var(--mute);width:26px;height:26px;
+  border-radius:6px;font-size:15px;
+  cursor:pointer;
+  display:grid;place-items:center;
+}
+li .edit-btn:hover, li .del-btn:hover{background:var(--line);color:var(--danger)}
+
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:var(--mute);font-size:13px}
+.foot button{border:0;background:transparent;color:var(--mute);text-decoration:underline;cursor:pointer}
+.empty{color:var(--mute);padding:14px 4px;text-align:center}
+
+dialog{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--panel);
+  color:var(--ink);
+  padding:24px;
+  width:min(420px,92vw);
+  box-shadow: 12px 12px 30px var(--shadow-dark), -12px -12px 30px var(--shadow-light);
+}
+dialog::backdrop{background:rgba(0,0,0,0.5);backdrop-filter:blur(4px)}
+dialog h3{margin:0 0 16px;font-size:18px}
+dialog label{display:block;font-size:13px;color:var(--mute);margin:12px 0 4px}
+dialog input{
+  width:100%;
+  border:1px solid var(--line);
+  background:var(--panel);
+  border-radius:10px;
+  padding:10px 14px;
+  box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+}
+dialog input:focus{outline:0;border-color:var(--accent)}
+.err{color:var(--danger);font-size:13px;min-height:20px;margin-top:8px}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+
+@media (max-width:900px){
+  main{grid-template-columns:1fr}
+  .clock{font-size:48px}
+  .wrap{padding:24px 16px}
+  .theme-btn{position:static;margin-bottom:12px}
+  header{align-items:stretch}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
+    <div class="clock-container">
+      <div class="clock" id="clock">00:00</div>
+      <div class="date" id="date"></div>
+    </div>
+  </header>
+
+  <form class="search" action="https://www.google.com/search" method="get">
+    <input id="q" name="q" type="search" placeholder="ค้นหาด้วย Google" autocomplete="off" autofocus aria-label="ค้นหาด้วย Google">
+    <kbd>/</kbd>
+    <button type="submit">ค้นหา</button>
+  </form>
+
+  <main>
+    <div class="left-column">
+      <!-- ส่วน Todo อ้างอิงตาม Diagram ของ index_2.html -->
+      <section class="todo" aria-label="รายการงาน">
+        <h2>สิ่งที่ต้องทำ <span class="count" id="count"></span></h2>
+        
+        <form id="todoForm" onsubmit="addOrUpdateTask(event)">
+          <input type="text" id="todoInput" placeholder="ชื่อภารกิจ เช่น ไปส่งมดแดง..." maxlength="200" required aria-label="เพิ่มงานใหม่">
+          <div style="display:flex; gap:8px;">
+            <input type="date" id="todoDate" aria-label="วันที่เริ่มต้น" style="flex:1">
+            <input type="time" id="todoTime" value="09:00" aria-label="เวลา" style="flex:0 0 110px">
+          </div>
+          <select id="todoRepeat" onchange="toggleRepeatEnd()">
+            <option value="once">ทำครั้งเดียว (เฉพาะวันที่เลือก)</option>
+            <option value="everyday">ทุกวัน</option>
+            <option value="weekly">รายสัปดาห์</option>
+          </select>
+          <div id="repeatEndWrap" style="display:none; margin-bottom:8px;">
+            <label style="font-size:11px; color:var(--mute); margin-bottom:2px;">วันที่สิ้นสุดการทำซ้ำ (ไม่บังคับ)</label>
+            <input type="date" id="todoRepeatEnd">
+          </div>
+          <button class="btn" type="submit" id="submitTaskBtn" style="width:100%">เพิ่มภารกิจ</button>
+        </form>
+
+        <div class="filters" id="filters" style="margin-top:14px;">
+          <button type="button" data-f="all" aria-pressed="true">ทั้งหมด</button>
+          <button type="button" data-f="active" aria-pressed="false">ยังไม่เสร็จ</button>
+          <button type="button" data-f="done" aria-pressed="false">เสร็จแล้ว</button>
+        </div>
+
+        <ul id="list"></ul>
+        <div class="foot"><span id="left"></span><button type="button" id="clearDone">ลบที่เสร็จแล้ว</button></div>
+      </section>
+
+      <!-- ทางลัดอยู่ด้านล่าง -->
+      <section>
+        <h2>ทางลัด</h2>
+        <div class="tiles" id="tiles"></div>
+      </section>
+    </div>
+
+    <!-- ปฏิทินแสดงผลพร้อมจุดบอกสถานะรายการที่มี -->
+    <section aria-label="ปฏิทิน">
+      <div class="calendar-header">
+        <button type="button" id="prevMonth" aria-label="เดือนก่อนหน้า">&lt;</button>
+        <h3 id="calTitle" style="margin:0;font-size:16px;font-weight:600;"></h3>
+        <button type="button" id="nextMonth" aria-label="เดือนถัดไป">&gt;</button>
+      </div>
+      <div class="calendar-grid" id="calGrid"></div>
+      <div id="selectedDateSummary" style="margin-top: 16px; font-size: 13px; color: var(--mute);"></div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <form id="linkForm" method="dialog">
+    <h3>เพิ่มทางลัด</h3>
+    <label for="url">ที่อยู่เว็บไซต์ (URL)</label>
+    <input id="url" type="text" placeholder="youtube.com" autocomplete="off">
+    <label for="name">ชื่อ (ไม่ใส่ก็ได้)</label>
+    <input id="name" type="text" placeholder="ใช้ชื่อโดเมนถ้าเว้นว่าง" maxlength="30" autocomplete="off">
+    <div class="err" id="err" role="alert"></div>
+    <div class="actions">
+      <button class="btn ghost" type="button" id="cancel">ยกเลิก</button>
+      <button class="btn" type="submit">เพิ่มทางลัด</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+const pad2 = n => String(n).padStart(2, '0');
+const getTodayStr = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+};
+
+// ข้อมูลตัวอย่างเริ่มต้นตาม Diagram (index_2.html)
+let tasks = load('tasks', [
+  { id: 1, title: 'ไปส่งมดแดง', time: '07:00', date: '2026-09-01', repeat: 'everyday' },
+  { id: 2, title: 'เช็คน้ำมันก่อนวิ่งงาน', time: '10:00', date: '2026-09-20', repeat: 'once' },
+  { id: 3, title: 'ไปรับมดแดง', time: '20:30', date: '2026-09-01', repeat: 'everyday' },
+  { id: 5, title: 'ล้างรถประจำสัปดาห์', time: '16:00', date: '2026-09-15', repeat: 'once' }
+]);
+
+let dailyCompletions = load('dailyCompletions', {
+  '2026-09-20': [1],
+  '2026-09-24': [1]
+});
+
+let filter = 'all';
+let editingId = null;
+let selectedCalendarDate = getTodayStr();
+
+$('#todoDate').value = getTodayStr();
+
+/* ---------- ธีม ---------- */
+const root = document.documentElement;
+function setTheme(t) {
+  root.dataset.theme = t;
+  $('#theme').textContent = t === 'dark' ? 'โหมดสว่าง' : 'โหมดมืด';
+  save('theme', t);
+}
+setTheme(load('theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+$('#theme').onclick = () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
+
+/* ---------- นาฬิกา ---------- */
+function tick() {
+  const d = new Date();
+  $('#clock').textContent = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  $('#date').textContent = d.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+tick(); setInterval(tick, 1000);
+
+/* ---------- ค้นหาด้วย / ---------- */
+document.addEventListener('keydown', e => {
+  const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+  if (e.key === '/' && !typing && !$('#dlg').open) { e.preventDefault(); $('#q').focus(); }
+  if (e.key === 'Escape' && document.activeElement === $('#q')) $('#q').blur();
+});
+
+/* ---------- ทางลัด (Shortcuts) ---------- */
+let links = load('links', [
+  { name: 'Gmail', url: 'https://mail.google.com' },
+  { name: 'YouTube', url: 'https://www.youtube.com' },
+  { name: 'GitHub', url: 'https://github.com' }
+]);
+const hue = s => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+
+function icon(l) {
+  const host = new URL(l.url).hostname;
+  const box = document.createElement('div');
+  box.className = 'ico';
+  const span = document.createElement('span');
+  span.textContent = (l.name[0] || '?').toUpperCase();
+  box.style.background = `hsl(${hue(host)} 55% 42%)`;
+  box.appendChild(span);
+  return box;
+}
+
+function renderLinks() {
+  const wrap = $('#tiles');
+  wrap.textContent = '';
+  links.forEach((l, i) => {
+    const a = document.createElement('a');
+    a.className = 'tile';
+    a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
+    a.title = l.url;
+    const n = document.createElement('span');
+    n.className = 'n'; n.textContent = l.name;
+    const del = document.createElement('button');
+    del.className = 'del'; del.type = 'button'; del.textContent = '×';
+    del.setAttribute('aria-label', 'ลบทางลัด ' + l.name);
+    del.onclick = e => { e.preventDefault(); e.stopPropagation(); links.splice(i, 1); save('links', links); renderLinks(); };
+    a.append(icon(l), n, del);
+    wrap.appendChild(a);
+  });
+  const add = document.createElement('button');
+  add.className = 'tile add-tile'; add.type = 'button';
+  add.innerHTML = '<b>+</b>เพิ่มทางลัด';
+  add.onclick = openDialog;
+  wrap.appendChild(add);
+}
+
+const dlg = $('#dlg');
+function openDialog() { $('#url').value = ''; $('#name').value = ''; $('#err').textContent = ''; dlg.showModal(); $('#url').focus(); }
+$('#cancel').onclick = () => dlg.close();
+$('#linkForm').addEventListener('submit', e => {
+  e.preventDefault();
+  let raw = $('#url').value.trim();
+  if (!raw) { $('#err').textContent = 'กรุณาใส่ที่อยู่เว็บไซต์'; return; }
+  if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
+  let u;
+  try { u = new URL(raw); if (!u.hostname.includes('.')) throw 0; }
+  catch { $('#err').textContent = 'ที่อยู่เว็บไซต์ไม่ถูกต้อง เช่น youtube.com'; return; }
+  const name = $('#name').value.trim() || u.hostname.replace(/^www\./, '');
+  links.push({ name, url: u.href });
+  save('links', links); renderLinks(); dlg.close();
+});
+
+/* ---------- ระบบ Todo & ปฏิทิน ---------- */
+function toggleRepeatEnd() {
+  const repeat = $('#todoRepeat').value;
+  $('#repeatEndWrap').style.display = (repeat === 'once') ? 'none' : 'block';
+}
+
+function getDayOfWeekIndex(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d).getDay();
+}
+
+function repeatLabel(task) {
+  if (task.repeat === 'once') return 'ครั้งเดียว';
+  if (task.repeat === 'everyday') return 'ทุกวัน';
+  if (task.repeat === 'weekly') return 'รายสัปดาห์';
+  return task.repeat;
+}
+
+function getTasksForDate(dateStr) {
+  return tasks.filter(t => {
+    if (t.date > dateStr) return false;
+    if (t.repeatEnd && t.repeatEnd < dateStr) return false;
+    if (t.repeat === 'once') return t.date === dateStr;
+    if (t.repeat === 'everyday') return true;
+    if (t.repeat === 'weekly') return getDayOfWeekIndex(t.date) === getDayOfWeekIndex(dateStr);
+    return false;
+  }).sort((a, b) => a.time.localeCompare(b.time));
+}
+
+function isTaskCompletedOnDate(taskId, dateStr) {
+  if (!dailyCompletions[dateStr]) return false;
+  return dailyCompletions[dateStr].includes(taskId);
+}
+
+function toggleTaskForDate(taskId, dateStr) {
+  if (!dailyCompletions[dateStr]) dailyCompletions[dateStr] = [];
+  const idx = dailyCompletions[dateStr].indexOf(taskId);
+  if (idx > -1) {
+    dailyCompletions[dateStr].splice(idx, 1);
+  } else {
+    dailyCompletions[dateStr].push(taskId);
+  }
+  persist();
+  renderTodos();
+  renderCalendar();
+}
+
+const persist = () => {
+  save('tasks', tasks);
+  save('dailyCompletions', dailyCompletions);
+};
+
+/* ---------- ปฏิทิน ---------- */
+let calDate = new Date();
+
+function renderCalendar() {
+  const grid = $('#calGrid');
+  grid.textContent = '';
+  const year = calDate.getFullYear();
+  const month = calDate.getMonth();
+
+  const THAI_MONTHS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+  $('#calTitle').textContent = `${THAI_MONTHS[month]} ${year + 543}`;
+
+  ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'].forEach(w => {
+    const div = document.createElement('div');
+    div.className = 'calendar-weekday';
+    div.textContent = w;
+    grid.appendChild(div);
+  });
+
+  const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+  const totalDays = new Date(year, month + 1, 0).getDate();
+  const todayStr = getTodayStr();
+
+  for (let i = 0; i < firstDayIndex; i++) {
+    const emptyDiv = document.createElement('div');
+    emptyDiv.className = 'calendar-day empty';
+    grid.appendChild(emptyDiv);
+  }
+
+  for (let d = 1; d <= totalDays; d++) {
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'calendar-day';
+    const mStr = String(month + 1).padStart(2, '0');
+    const dStr = String(d).padStart(2, '0');
+    const currStr = `${year}-${mStr}-${dStr}`;
+
+    dayDiv.textContent = d;
+    if (currStr === todayStr) dayDiv.classList.add('today');
+    if (currStr === selectedCalendarDate) {
+      dayDiv.style.background = 'var(--accent)';
+      dayDiv.style.color = 'var(--accent-ink)';
+    }
+
+    const hasEvents = getTasksForDate(currStr).length > 0;
+    if (hasEvents) dayDiv.classList.add('has-event');
+
+    dayDiv.onclick = () => {
+      selectedCalendarDate = currStr;
+      renderCalendar();
+      renderTodos();
+    };
+
+    grid.appendChild(dayDiv);
+  }
+
+  const selectedTasks = getTasksForDate(selectedCalendarDate);
+  $('#selectedDateSummary').textContent = `📅 วันที่ ${selectedCalendarDate}: มีภารกิจทั้งหมด ${selectedTasks.length} รายการ`;
+}
+
+$('#prevMonth').onclick = () => { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); };
+$('#nextMonth').onclick = () => { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); };
+
+/* ---------- เรนเดอร์รายการ Todo ---------- */
+function renderTodos() {
+  const ul = $('#list');
+  ul.textContent = '';
+  
+  const targetDate = selectedCalendarDate;
+  const todayTasks = getTasksForDate(targetDate);
+
+  let completedCount = 0;
+  todayTasks.forEach(t => { if (isTaskCompletedOnDate(t.id, targetDate)) completedCount++; });
+
+  const shown = todayTasks.filter(t => filter === 'all' || (filter === 'done') === isTaskCompletedOnDate(t.id, targetDate));
+  
+  if (!shown.length) {
+    const li = document.createElement('li');
+    li.className = 'empty';
+    li.textContent = todayTasks.length ? 'ไม่มีงานในหมวดนี้' : `ไม่มีภารกิจในวันที่ ${targetDate}`;
+    ul.appendChild(li);
+  }
+
+  shown.forEach(t => {
+    const isDone = isTaskCompletedOnDate(t.id, targetDate);
+    const li = document.createElement('li');
+    if (isDone) li.className = 'done';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = isDone;
+    cb.setAttribute('aria-label', 'ทำเสร็จแล้ว: ' + t.title);
+    cb.onchange = () => toggleTaskForDate(t.id, targetDate);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 't-content';
+
+    const txt = document.createElement('span');
+    txt.className = 't'; txt.textContent = t.title;
+    contentDiv.appendChild(txt);
+
+    const meta = document.createElement('div');
+    meta.className = 't-meta';
+    meta.innerHTML = `<span>⏰ ${t.time}</span><span>•</span><span>${repeatLabel(t)}</span>`;
+    contentDiv.appendChild(meta);
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-btn'; editBtn.type = 'button'; editBtn.innerHTML = '✎';
+    editBtn.title = 'แก้ไข';
+    editBtn.onclick = () => startEditTask(t.id);
+
+    const del = document.createElement('button');
+    del.className = 'del-btn'; del.type = 'button'; del.textContent = '×';
+    del.setAttribute('aria-label', 'ลบงาน: ' + t.title);
+    del.onclick = () => {
+      tasks = tasks.filter(x => x.id !== t.id);
+      persist();
+      renderTodos();
+      renderCalendar();
+    };
+
+    li.append(cb, contentDiv, editBtn, del);
+    ul.appendChild(li);
+  });
+
+  const total = todayTasks.length;
+  $('#count').textContent = total ? `${completedCount}/${total}` : '';
+  $('#left').textContent = total ? `สำเร็จ ${completedCount} จาก ${total} งาน` : 'ไม่มีภารกิจ';
+  $('#clearDone').style.display = completedCount > 0 ? '' : 'none';
+  renderCalendar();
+}
+
+function addOrUpdateTask(e) {
+  e.preventDefault();
+  const title = $('#todoInput').value.trim();
+  const date = $('#todoDate').value || getTodayStr();
+  const time = $('#todoTime').value || '09:00';
+  const repeat = $('#todoRepeat').value;
+  const repeatEnd = $('#todoRepeatEnd').value || null;
+
+  if (!title) return;
+
+  if (editingId !== null) {
+    const task = tasks.find(t => t.id === editingId);
+    if (task) {
+      task.title = title;
+      task.date = date;
+      task.time = time;
+      task.repeat = repeat;
+      task.repeatEnd = repeatEnd;
+    }
+    editingId = null;
+    $('#submitTaskBtn').textContent = 'เพิ่มภารกิจ';
+  } else {
+    const newTask = {
+      id: Date.now(),
+      title,
+      time,
+      date,
+      repeat,
+      repeatEnd
+    };
+    tasks.unshift(newTask);
+  }
+
+  $('#todoInput').value = '';
+  $('#todoRepeatEnd').value = '';
+  $('#repeatEndWrap').style.display = 'none';
+  persist();
+  renderTodos();
+}
+
+function startEditTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  editingId = id;
+  $('#todoInput').value = t.title;
+  $('#todoDate').value = t.date;
+  $('#todoTime').value = t.time;
+  $('#todoRepeat').value = t.repeat;
+  $('#todoRepeatEnd').value = t.repeatEnd || '';
+  toggleRepeatEnd();
+  $('#submitTaskBtn').textContent = 'บันทึกการแก้ไข';
+  $('#todoInput').focus();
+}
+
+$('#clearDone').onclick = () => {
+  const targetDate = selectedCalendarDate;
+  const todayTasks = getTasksForDate(targetDate);
+  todayTasks.forEach(t => {
+    if (isTaskCompletedOnDate(t.id, targetDate)) {
+      toggleTaskForDate(t.id, targetDate);
+    }
+  });
+  renderTodos();
+};
+
+$('#filters').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  filter = b.dataset.f;
+  document.querySelectorAll('#filters button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  renderTodos();
+};
+
+renderLinks();
+renderTodos();
+renderCalendar();
+</script>
+</body>
+</html>
