@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>หน้าเริ่มต้นของฉัน</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="theme-color" content="#8B5CF6">
 <style>
 :root {
   --bg: #e4ebf5;
@@ -148,9 +151,12 @@ form.search{
 }
 .search button:hover{opacity: 0.9}
 
+main > section:nth-child(1){order:3}  /* แดชบอร์ด → ขวาสุด */
+main > section:nth-child(2){order:2}  /* ภารกิจ → กลาง */
+main > section:nth-child(3){order:1}  /* ปฏิทิน → ซ้ายสุด */
 main{
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr);
   gap: 24px;
   align-items: stretch;
   flex: 1;
@@ -526,6 +532,7 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 
 @media (max-width:900px){
   main{grid-template-columns:1fr;flex:none}
+  main > section{order:0 !important}
   main > section{height:auto;overflow:visible}
   .clock{font-size:38px}
   .wrap{padding:14px 16px 62px;height:auto;display:block}
@@ -602,7 +609,7 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
 <div class="wrap">
   <header>
     <div class="header-actions">
-      <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบ Push</button>
+      <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบแจ้งเตือน</button>
       <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
       <button class="color-btn" id="colorBtn" type="button" title="เปลี่ยนสี" aria-label="เปลี่ยนสีหลัก"><i></i></button>
       <div class="color-pop" id="colorPop" hidden></div>
@@ -823,12 +830,13 @@ const BG_ICONS = {
   none:    '<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>'
 };
 function updateBgIcon() {
+  $('#bgBtn').title = 'อนิเมชั่นพื้นหลัง: ' + BG_MODES.find(m => m.id === bgMode).label;
   $('#bgIcon').innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${BG_ICONS[bgMode]}</svg>`;
 }
 const bgCanvas = $('#bg');
 const bctx = bgCanvas.getContext('2d');
-let bgMode = load('bgMode', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'none' : 'aurora');
-if (!BG_MODES.some(m => m.id === bgMode)) bgMode = 'aurora';
+let bgMode = load('bgMode2', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'none' : 'rain');
+if (!BG_MODES.some(m => m.id === bgMode)) bgMode = 'rain';
 let bgW = 0, bgH = 0, bgRAF = 0, bgLast = 0, bgFrame = 0, bgState = {};
 let bgAccent = { h: 262, s: 90, l: 66 }, bgDark = true;
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -1022,9 +1030,8 @@ $('#bgBtn').onclick = e => {
   $('#colorPop').hidden = true;
   const i = BG_MODES.findIndex(m => m.id === bgMode);
   bgMode = BG_MODES[(i + 1) % BG_MODES.length].id;
-  save('bgMode', bgMode);
+  save('bgMode2', bgMode);
   startBg();
-  showBgToast();
 };
 let bgResizeTimer;
 addEventListener('resize', () => { clearTimeout(bgResizeTimer); bgResizeTimer = setTimeout(resizeBg, 150); });
@@ -1054,33 +1061,72 @@ function updateSubButton() {
 }
 updateSubButton();
 
-$('#subBtn').onclick = () => {
-  isSubscribed = !isSubscribed;
-  save('isSubscribed', isSubscribed);
-  updateSubButton();
-  alert(isSubscribed ? 'เปิดการแจ้งเตือนแล้ว' : 'ยกเลิกการสมัครรับแจ้งเตือนแล้ว');
+/* ---------- แจ้งเตือนจริง (ส่งถึงเครื่องแม้ปิดหน้าเว็บ) ---------- */
+const pushOK = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+let swReg = null;
+const b64ToU8 = b => { const r = atob((b + '='.repeat((4 - b.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(r, c => c.charCodeAt(0)); };
+async function getReg() {
+  if (!swReg) { await navigator.serviceWorker.register('/sw.js'); swReg = await navigator.serviceWorker.ready; }
+  return swReg;
+}
+const postSync = (method, body) => fetch('/api/sync', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+
+function buildReminders() {
+  const out = [], now = Date.now(), d = new Date();
+  for (let i = 0; i < 30; i++) {
+    const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    getTasksForDate(ds).forEach(t => {
+      const time = t.time || '09:00';
+      const at = new Date(`${ds}T${time}:00`).getTime();
+      if (at > now && !isTaskCompletedOnDate(t.id, ds)) out.push({ k: t.id + '|' + ds, at, title: t.title, body: '⏰ ถึงเวลาแล้ว ' + time + ' น.' });
+    });
+    d.setDate(d.getDate() + 1);
+  }
+  return out.slice(0, 500);
+}
+let syncTimer;
+function syncReminders() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    if (!isSubscribed || !pushOK) return;
+    try { const sub = await (await getReg()).pushManager.getSubscription(); if (sub) await postSync('POST', { sub: sub.toJSON(), reminders: buildReminders() }); } catch {}
+  }, 800);
+}
+
+$('#subBtn').onclick = async () => {
+  try {
+    if (!isSubscribed) {
+      if (!pushOK) { alert('เบราว์เซอร์นี้ยังไม่รองรับการแจ้งเตือนแบบนี้ (บน iPhone ให้กด "เพิ่มไปยังหน้าจอโฮม" แล้วเปิดจากไอคอนก่อน)'); return; }
+      if (await Notification.requestPermission() !== 'granted') { alert('ยังไม่ได้อนุญาตการแจ้งเตือน กรุณาอนุญาตในการตั้งค่าของเว็บไซต์'); return; }
+      const reg = await getReg();
+      const { key } = await (await fetch('/api/sync')).json();
+      await (reg.pushManager.getSubscription().then(s => s || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(key) })));
+      isSubscribed = true; syncReminders();
+    } else {
+      const sub = await (await getReg()).pushManager.getSubscription();
+      if (sub) { await postSync('DELETE', { sub: sub.toJSON() }); await sub.unsubscribe(); }
+      isSubscribed = false;
+    }
+    save('isSubscribed', isSubscribed); updateSubButton();
+  } catch { alert('เปิดการแจ้งเตือนไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'); }
 };
 
-$('#pushTestBtn').onclick = () => {
-  if (!isSubscribed) {
-    alert('กรุณากด "เปิดแจ้งเตือน" ก่อนทดสอบ');
-    return;
-  }
-  if (Notification.permission === 'granted') {
-    new Notification('ทดสอบการแจ้งเตือน', {
-      body: 'ระบบแจ้งเตือนทำงานปกติ',
-      icon: 'https://www.gstatic.com/images/branding/product/2x/googleg_96dp.png'
-    });
-  } else if (Notification.permission !== 'denied') {
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        new Notification('ทดสอบการแจ้งเตือน', { body: 'เปิดใช้งานการแจ้งเตือนสำเร็จ!' });
-      }
-    });
-  } else {
-    alert('เบราว์เซอร์ถูกบล็อกการแจ้งเตือน กรุณาปลดล็อคในการตั้งค่าเว็บไซต์');
-  }
+$('#pushTestBtn').onclick = async () => {
+  if (!isSubscribed) { alert('กรุณากด "เปิดแจ้งเตือน" ก่อนทดสอบ'); return; }
+  try {
+    const sub = await (await getReg()).pushManager.getSubscription();
+    const r = sub && await postSync('POST', { sub: sub.toJSON(), test: true });
+    if (!r || !r.ok) alert('ส่งการแจ้งเตือนทดสอบไม่สำเร็จ');
+  } catch { alert('ส่งการแจ้งเตือนทดสอบไม่สำเร็จ'); }
 };
+
+(async () => {
+  if (!isSubscribed) return;
+  let ok = false;
+  try { ok = pushOK && Notification.permission === 'granted' && !!(await (await getReg()).pushManager.getSubscription()); } catch {}
+  if (!ok) { isSubscribed = false; save('isSubscribed', false); updateSubButton(); } else syncReminders();
+})();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) syncReminders(); });
 
 document.addEventListener('keydown', e => {
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
@@ -1196,6 +1242,7 @@ function toggleTaskForDate(taskId, dateStr) {
 const persist = () => {
   save('tasks', tasks);
   save('dailyCompletions', dailyCompletions);
+  syncReminders();
 };
 
 /* ---------- ปฏิทิน ---------- */
