@@ -366,7 +366,7 @@ h2{
 /* Todo / List */
 .todo input[type=text], .todo input[type=date], .todo select, .todo input[type=time]{
   width:100%;
-  border: 1px solid var(--line);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 65%, transparent);
   background: var(--panel);
   border-radius: 10px;
   padding: 10px 14px;
@@ -499,6 +499,16 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
+/* กรอบสีของช่องกรอก/แก้ไข ตามโทนสีหลัก */
+.todo input[type=text]:focus, .todo input[type=date]:focus, .todo input[type=time]:focus, .todo select:focus,
+dialog input:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+dialog input{border:1.5px solid color-mix(in srgb, var(--accent) 65%, transparent)}
+form.search{border:1.5px solid color-mix(in srgb, var(--accent) 65%, transparent)}
+form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent)}
+
 /* ปุ่มเปลี่ยนสี */
 .color-btn{
   width:34px;height:34px;padding:0;border:none;border-radius:50%;
@@ -617,7 +627,8 @@ dialog input:focus{outline:0;border-color:var(--accent)}
         </div>
         
         <form id="todoForm" onsubmit="addOrUpdateTask(event)">
-          <input type="text" id="todoInput" placeholder="ชื่อภารกิจ เช่น ไปส่งมดแดง..." maxlength="200" required aria-label="เพิ่มงานใหม่">
+          <input type="text" id="todoInput" placeholder="ทำอะไรดีวันนี้
+          " maxlength="200" required aria-label="เพิ่มงานใหม่">
           <div style="display:flex; gap:8px;">
             <input type="date" id="todoDate" aria-label="วันที่เริ่มต้น" style="flex:1; min-width:0">
             <input type="time" id="todoTime" value="09:00" aria-label="เวลา" style="flex:0 0 132px; min-width:0">
