@@ -482,6 +482,36 @@ li .edit-btn:hover, li .del-btn:hover{background:var(--line);color:var(--danger)
 .foot button{border:0;background:transparent;color:var(--mute);text-decoration:underline;cursor:pointer}
 .empty{color:var(--mute);padding:14px 4px;text-align:center}
 
+/* Delete-scope confirmation modal (สำหรับภารกิจที่ทำซ้ำหลายวัน) */
+.del-modal-overlay{
+  position:fixed; inset:0; z-index:200;
+  background:rgba(0,0,0,0.45);
+  display:flex; align-items:center; justify-content:center;
+  padding:16px;
+}
+.del-modal-overlay[hidden]{display:none}
+.del-modal{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:22px;
+  max-width:360px;
+  width:100%;
+  box-shadow:8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+}
+.del-modal h3{margin:0 0 6px;font-size:16px;font-weight:600}
+.del-modal p{margin:0 0 18px;font-size:13px;color:var(--mute)}
+.del-modal-actions{display:flex;flex-direction:column;gap:10px}
+.del-modal-actions button{
+  border:0;border-radius:12px;padding:11px 14px;
+  font-size:14px;font-weight:500;text-align:left;
+  box-shadow:4px 4px 9px var(--shadow-dark), -4px -4px 9px var(--shadow-light);
+  background:var(--panel);
+}
+.del-modal-actions button:active{box-shadow:inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light)}
+.del-modal-actions button.danger-all{color:var(--danger)}
+.del-modal-actions button.cancel-btn{color:var(--mute);text-align:center;box-shadow:none;background:transparent}
+
 /* Dashboard Metrics & Progress Bars (ผสานจากไฟล์ที่สอง) */
 .stat-card {
   background: var(--panel);
@@ -746,6 +776,18 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
     </div>
   </form>
 </dialog>
+
+<div class="del-modal-overlay" id="delModalOverlay" hidden>
+  <div class="del-modal" role="dialog" aria-modal="true" aria-labelledby="delModalTitle">
+    <h3 id="delModalTitle">ลบภารกิจนี้อย่างไร?</h3>
+    <p id="delModalDesc">ภารกิจนี้เป็นแบบทำซ้ำ เลือกขอบเขตการลบ</p>
+    <div class="del-modal-actions">
+      <button type="button" id="delOnlyThisDay"></button>
+      <button type="button" id="delAllDays" class="danger-all">ลบทั้งหมดทุกวัน (ลบภารกิจนี้ถาวร)</button>
+      <button type="button" id="delCancel" class="cancel-btn">ยกเลิก</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -1213,6 +1255,7 @@ function repeatLabel(task) {
 
 function getTasksForDate(dateStr) {
   return tasks.filter(t => {
+    if (t.excludedDates && t.excludedDates.includes(dateStr)) return false;
     if (t.date > dateStr) return false;
     if (t.repeatEnd && t.repeatEnd < dateStr) return false;
     if (t.repeat === 'once') return t.date === dateStr;
@@ -1244,6 +1287,64 @@ const persist = () => {
   save('dailyCompletions', dailyCompletions);
   syncReminders();
 };
+
+/* ---------- ลบภารกิจ: เฉพาะวันนี้ หรือ ทั้งหมด ---------- */
+let pendingDelete = null; // { task, dateStr }
+
+function deleteTaskEntirely(taskId) {
+  tasks = tasks.filter(x => x.id !== taskId);
+  Object.keys(dailyCompletions).forEach(dateStr => {
+    dailyCompletions[dateStr] = dailyCompletions[dateStr].filter(id => id !== taskId);
+  });
+  persist();
+  renderAll();
+}
+
+function deleteTaskOnDate(taskId, dateStr) {
+  const t = tasks.find(x => x.id === taskId);
+  if (!t) return;
+  if (!t.excludedDates) t.excludedDates = [];
+  if (!t.excludedDates.includes(dateStr)) t.excludedDates.push(dateStr);
+  // เอาสถานะทำเสร็จของวันนั้นออกด้วย เพื่อไม่ให้ค้างในสถิติ
+  if (dailyCompletions[dateStr]) {
+    dailyCompletions[dateStr] = dailyCompletions[dateStr].filter(id => id !== taskId);
+  }
+  persist();
+  renderAll();
+}
+
+function closeDeleteModal() {
+  $('#delModalOverlay').hidden = true;
+  pendingDelete = null;
+}
+
+function requestDeleteTask(task, dateStr) {
+  // ภารกิจแบบครั้งเดียวมีอยู่วันเดียวอยู่แล้ว ลบตรงได้เลยไม่ต้องถาม
+  if (task.repeat === 'once') {
+    deleteTaskEntirely(task.id);
+    return;
+  }
+  pendingDelete = { task, dateStr };
+  $('#delModalDesc').textContent = `"${task.title}" เป็นภารกิจแบบทำซ้ำ (${repeatLabel(task)}) เลือกขอบเขตการลบ`;
+  $('#delOnlyThisDay').textContent = `ลบเฉพาะวันที่ ${dateStr}`;
+  $('#delModalOverlay').hidden = false;
+}
+
+$('#delOnlyThisDay').onclick = () => {
+  if (pendingDelete) deleteTaskOnDate(pendingDelete.task.id, pendingDelete.dateStr);
+  closeDeleteModal();
+};
+$('#delAllDays').onclick = () => {
+  if (pendingDelete) deleteTaskEntirely(pendingDelete.task.id);
+  closeDeleteModal();
+};
+$('#delCancel').onclick = closeDeleteModal;
+$('#delModalOverlay').addEventListener('click', e => {
+  if (e.target.id === 'delModalOverlay') closeDeleteModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('#delModalOverlay').hidden) closeDeleteModal();
+});
 
 /* ---------- ปฏิทิน ---------- */
 let calDate = new Date();
@@ -1486,11 +1587,7 @@ function renderTodos() {
     const del = document.createElement('button');
     del.className = 'del-btn'; del.type = 'button'; del.textContent = '×';
     del.setAttribute('aria-label', 'ลบงาน: ' + t.title);
-    del.onclick = () => {
-      tasks = tasks.filter(x => x.id !== t.id);
-      persist();
-      renderAll();
-    };
+    del.onclick = () => requestDeleteTask(t, targetDate);
 
     li.append(cb, contentDiv, editBtn, del);
     ul.appendChild(li);
@@ -1530,7 +1627,8 @@ function addOrUpdateTask(e) {
       time,
       date,
       repeat,
-      repeatEnd
+      repeatEnd,
+      excludedDates: []
     };
     tasks.unshift(newTask);
   }
