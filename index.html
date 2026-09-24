@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Task & Subscription App (Integrated Dashboard)</title>
+<title>หน้าเริ่มต้นของฉัน</title>
 <style>
 :root {
   --bg: #e4ebf5;
@@ -276,7 +276,7 @@ h2{
   margin-top: 2px;
 }
 
-/* Tiles / Shortcuts */
+/* Tiles */
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:14px}
 .tile{
   position:relative;
@@ -470,6 +470,20 @@ dialog input:focus{outline:0;border-color:var(--accent)}
   header{align-items:stretch}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Agenda (รายการของวันที่เลือก) */
+.agenda{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.agenda-head{font-size:13px;font-weight:700;color:var(--mute);margin-bottom:10px}
+.agenda-empty{font-size:13px;color:var(--mute);padding:10px 0}
+.agenda-item{display:flex;align-items:stretch;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.agenda-item:last-child{border-bottom:0}
+.agenda-time{flex:0 0 46px;font-size:13px;font-weight:600;color:var(--ink);padding-top:1px}
+.agenda-bar{flex:0 0 4px;border-radius:2px;background:var(--accent)}
+.agenda-info{min-width:0}
+.agenda-title{font-size:14px;font-weight:600;word-break:break-word}
+.agenda-sub{font-size:11px;color:var(--mute);margin-top:1px}
+.agenda-item.done .agenda-title{text-decoration:line-through;color:var(--mute)}
+.agenda-item.done .agenda-bar{background:var(--success);opacity:.6}
 </style>
 </head>
 <body>
@@ -493,16 +507,16 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 
   <main>
     <div class="left-column">
-      <!-- ส่วน Todo และจำลอง Push Subscription -->
+      <!-- ส่วนภารกิจ -->
       <section class="todo" aria-label="รายการงาน">
-        <h2>Task & Subscription UI <span class="count" id="count"></span></h2>
+        <h2>ภารกิจของฉัน <span class="count" id="count"></span></h2>
         
         <div class="system-status">
           <div class="status-indicator">
-            <span class="dot"></span>
-            <span id="healthStatus">Health: OK (store.js active)</span>
+            <span class="dot" id="statusDot"></span>
+            <span id="healthStatus">แจ้งเตือน: ปิดอยู่</span>
           </div>
-          <button type="button" id="subBtn" style="border:0;background:var(--accent);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;">สมัครรับ Push</button>
+          <button type="button" id="subBtn" style="border:0;background:var(--accent);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;">เปิดแจ้งเตือน</button>
         </div>
         
         <form id="todoForm" onsubmit="addOrUpdateTask(event)">
@@ -520,7 +534,7 @@ dialog input:focus{outline:0;border-color:var(--accent)}
             <label style="font-size:11px; color:var(--mute); margin-bottom:2px;">วันที่สิ้นสุดการทำซ้ำ (ไม่บังคับ)</label>
             <input type="date" id="todoRepeatEnd">
           </div>
-          <button class="btn" type="submit" id="submitTaskBtn" style="width:100%">เพิ่มภารกิจ (tasks.js)</button>
+          <button class="btn" type="submit" id="submitTaskBtn" style="width:100%">เพิ่มภารกิจ</button>
         </form>
 
         <div class="filters" id="filters" style="margin-top:14px;">
@@ -535,12 +549,12 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 
       <!-- ทางลัด -->
       <section>
-        <h2>ทางลัดเว็บแอป (Shortcuts)</h2>
+        <h2>ทางลัดเว็บไซต์</h2>
         <div class="tiles" id="tiles"></div>
       </section>
     </div>
 
-    <!-- คอลัมน์ขวา: ปฏิทิน + แดชบอร์ดความสำเร็จขั้นสูง (ผสมจากไฟล์ที่สอง) -->
+    <!-- คอลัมน์ขวา: ปฏิทิน + แดชบอร์ด -->
     <div style="display: flex; flex-direction: column; gap: 32px;">
       <section aria-label="ปฏิทิน">
         <div class="calendar-header">
@@ -549,16 +563,16 @@ dialog input:focus{outline:0;border-color:var(--accent)}
           <button type="button" id="nextMonth" aria-label="เดือนถัดไป">&gt;</button>
         </div>
         <div class="calendar-grid" id="calGrid"></div>
-        <div id="selectedDateSummary" style="margin-top: 16px; font-size: 13px; color: var(--mute);"></div>
+        <div id="selectedDateSummary" class="agenda"></div>
       </section>
 
-      <!-- แดชบอร์ดความสำเร็จ (นำเข้าจาก Metodo Dashboard) -->
+      <!-- แดชบอร์ดความสำเร็จ -->
       <section aria-label="แดชบอร์ดความสำเร็จ">
         <h2>แดชบอร์ดความสำเร็จ</h2>
         
         <div class="stat-card">
           <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
-            <span>ความสำเร็จรายวัน (Daily)</span>
+            <span>ความสำเร็จรายวัน</span>
             <span id="stat-daily-val" style="color: var(--accent);">0%</span>
           </div>
           <div class="stat-bar-bg">
@@ -578,7 +592,7 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 
         <div class="stat-card">
           <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
-            <span>ความสำเร็จรายปี (Yearly - 2026)</span>
+            <span id="stat-yearly-label">ความสำเร็จรายปี</span>
             <span id="stat-yearly-val" style="color: var(--accent);">0%</span>
           </div>
           <div class="stat-bar-bg">
@@ -631,18 +645,16 @@ const getTodayStr = () => {
 const THAI_MONTHS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 const EN_MONTHS_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-let tasks = load('tasks', [
-  { id: 1, title: 'ไปส่งมดแดง', time: '07:00', date: '2026-09-01', repeat: 'everyday' },
-  { id: 2, title: 'เช็คน้ำมันก่อนวิ่งงาน', time: '10:00', date: '2026-09-20', repeat: 'once' },
-  { id: 3, title: 'ไปรับมดแดง', time: '20:30', date: '2026-09-01', repeat: 'everyday' },
-  { id: 5, title: 'ล้างรถประจำสัปดาห์', time: '16:00', date: '2026-09-15', repeat: 'once' }
-]);
+// รีเซ็ตประวัติเก่าหนึ่งครั้ง (เปลี่ยนเลขเวอร์ชันนี้เมื่อต้องการรีเซ็ตอีกครั้ง)
+const DATA_VERSION = 2;
+if (load('dataVersion', 0) < DATA_VERSION) {
+  save('tasks', []);
+  save('dailyCompletions', {});
+  save('dataVersion', DATA_VERSION);
+}
 
-let dailyCompletions = load('dailyCompletions', {
-  '2026-09-20': [1],
-  '2026-09-24': [1],
-  '2026-08-15': [1, 3]
-});
+let tasks = load('tasks', []);
+let dailyCompletions = load('dailyCompletions', {});
 
 let isSubscribed = load('isSubscribed', false);
 let filter = 'all';
@@ -661,7 +673,7 @@ function setTheme(t) {
 setTheme(load('theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 $('#theme').onclick = () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
 
-/* ---------- นาฬิกาและ Health Check ---------- */
+/* ---------- นาฬิกาและการแจ้งเตือน ---------- */
 function tick() {
   const d = new Date();
   $('#clock').textContent = d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -671,11 +683,14 @@ tick(); setInterval(tick, 1000);
 
 function updateSubButton() {
   const btn = $('#subBtn');
+  $('#healthStatus').textContent = isSubscribed ? 'แจ้งเตือน: เปิดอยู่' : 'แจ้งเตือน: ปิดอยู่';
+  $('#statusDot').style.background = isSubscribed ? 'var(--success)' : 'var(--mute)';
+  $('#statusDot').style.boxShadow = isSubscribed ? '0 0 6px var(--success)' : 'none';
   if (isSubscribed) {
-    btn.textContent = 'ยกเลิก Push (unsubscribe)';
+    btn.textContent = 'ปิดแจ้งเตือน';
     btn.style.background = 'var(--danger)';
   } else {
-    btn.textContent = 'สมัครรับ Push (subscribe)';
+    btn.textContent = 'เปิดแจ้งเตือน';
     btn.style.background = 'var(--accent)';
   }
 }
@@ -685,23 +700,23 @@ $('#subBtn').onclick = () => {
   isSubscribed = !isSubscribed;
   save('isSubscribed', isSubscribed);
   updateSubButton();
-  alert(isSubscribed ? 'จำลองการส่งข้อมูล Subscription สำเร็จ' : 'ยกเลิกการสมัครรับแจ้งเตือนแล้ว');
+  alert(isSubscribed ? 'เปิดการแจ้งเตือนแล้ว' : 'ยกเลิกการสมัครรับแจ้งเตือนแล้ว');
 };
 
 $('#pushTestBtn').onclick = () => {
   if (!isSubscribed) {
-    alert('กรุณากด "สมัครรับ Push" ก่อนทดสอบการแจ้งเตือน');
+    alert('กรุณากด "เปิดแจ้งเตือน" ก่อนทดสอบ');
     return;
   }
   if (Notification.permission === 'granted') {
-    new Notification('Test Notification (Web Push service)', {
-      body: 'การทดสอบส่งแจ้งเตือนจากระบบจำลองทำงานปกติ',
+    new Notification('ทดสอบการแจ้งเตือน', {
+      body: 'ระบบแจ้งเตือนทำงานปกติ',
       icon: 'https://www.gstatic.com/images/branding/product/2x/googleg_96dp.png'
     });
   } else if (Notification.permission !== 'denied') {
     Notification.requestPermission().then(permission => {
       if (permission === 'granted') {
-        new Notification('Test Notification', { body: 'เปิดใช้งานการแจ้งเตือนสำเร็จ!' });
+        new Notification('ทดสอบการแจ้งเตือน', { body: 'เปิดใช้งานการแจ้งเตือนสำเร็จ!' });
       }
     });
   } else {
@@ -715,7 +730,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.activeElement === $('#q')) $('#q').blur();
 });
 
-/* ---------- ทางลัด (Shortcuts) ---------- */
+/* ---------- ทางลัด ---------- */
 let links = load('links', [
   { name: 'Gmail', url: 'https://mail.google.com' },
   { name: 'YouTube', url: 'https://www.youtube.com' },
@@ -878,14 +893,61 @@ function renderCalendar() {
     grid.appendChild(dayDiv);
   }
 
-  const selectedTasks = getTasksForDate(selectedCalendarDate);
-  $('#selectedDateSummary').textContent = `📅 วันที่ ${selectedCalendarDate}: มีภารกิจทั้งหมด ${selectedTasks.length} รายการ`;
+  renderAgenda();
+}
+
+/* ---------- รายการของวันที่เลือก (สไตล์ปฏิทิน iPhone) ---------- */
+function renderAgenda() {
+  const box = $('#selectedDateSummary');
+  box.textContent = '';
+  const [y, m, d] = selectedCalendarDate.split('-').map(Number);
+  const dateObj = new Date(y, m - 1, d);
+
+  const head = document.createElement('div');
+  head.className = 'agenda-head';
+  head.textContent = dateObj.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  box.appendChild(head);
+
+  const list = getTasksForDate(selectedCalendarDate);
+  if (!list.length) {
+    const empty = document.createElement('div');
+    empty.className = 'agenda-empty';
+    empty.textContent = 'ไม่มีกิจกรรม';
+    box.appendChild(empty);
+    return;
+  }
+
+  list.forEach(t => {
+    const done = isTaskCompletedOnDate(t.id, selectedCalendarDate);
+    const row = document.createElement('div');
+    row.className = 'agenda-item' + (done ? ' done' : '');
+
+    const time = document.createElement('div');
+    time.className = 'agenda-time';
+    time.textContent = t.time;
+
+    const bar = document.createElement('div');
+    bar.className = 'agenda-bar';
+
+    const info = document.createElement('div');
+    info.className = 'agenda-info';
+    const title = document.createElement('div');
+    title.className = 'agenda-title';
+    title.textContent = t.title;
+    const sub = document.createElement('div');
+    sub.className = 'agenda-sub';
+    sub.textContent = repeatLabel(t) + (done ? ' • เสร็จแล้ว' : '');
+    info.append(title, sub);
+
+    row.append(time, bar, info);
+    box.appendChild(row);
+  });
 }
 
 $('#prevMonth').onclick = () => { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); };
 $('#nextMonth').onclick = () => { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); };
 
-/* ---------- แดชบอร์ดความสำเร็จขั้นสูง (ผสมจากไฟล์ที่สอง) ---------- */
+/* ---------- แดชบอร์ดความสำเร็จ ---------- */
 function renderStatsDashboard() {
   const todayStr = getTodayStr();
   const todayTasks = getTasksForDate(todayStr);
@@ -898,7 +960,7 @@ function renderStatsDashboard() {
   const nowStats = new Date();
   const statsYear = nowStats.getFullYear();
   const statsMonthStr = pad2(nowStats.getMonth() + 1);
-  $('#stat-monthly-label').textContent = `ความสำเร็จรายเดือน (${EN_MONTHS_ABBR[nowStats.getMonth()]} ${statsYear})`;
+  $('#stat-monthly-label').textContent = `ความสำเร็จรายเดือน (${THAI_MONTHS[nowStats.getMonth()]} ${statsYear + 543})`;
 
   let totalMonthTasks = 0;
   let completedMonthTasks = 0;
@@ -929,9 +991,10 @@ function renderStatsDashboard() {
   }
   const yearlyPct = totalYearTasks > 0 ? Math.min(100, Math.round((completedYearTasks / totalYearTasks) * 100)) : 0;
   $('#stat-yearly-val').textContent = `${yearlyPct}%`;
+  $('#stat-yearly-label').textContent = `ความสำเร็จรายปี (${statsYear + 543})`;
   $('#stat-yearly-bar').style.width = `${yearlyPct}%`;
 
-  // แถบรายเดือนทั้ง 12 เดือน (ตาม Metodo)
+  // แถบรายเดือนทั้ง 12 เดือน
   const monthlyContainer = $('#yearly-monthly-bars');
   monthlyContainer.textContent = '';
   THAI_MONTHS.forEach((mName, idx) => {
@@ -1054,7 +1117,7 @@ function addOrUpdateTask(e) {
       task.repeatEnd = repeatEnd;
     }
     editingId = null;
-    $('#submitTaskBtn').textContent = 'เพิ่มภารกิจ (tasks.js)';
+    $('#submitTaskBtn').textContent = 'เพิ่มภารกิจ';
   } else {
     const newTask = {
       id: Date.now(),
