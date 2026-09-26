@@ -152,17 +152,37 @@ form.search{
 }
 .search button:hover{opacity: 0.9}
 
-main > section:nth-child(1){order:3}  /* แดชบอร์ด → ขวาสุด */
-main > section:nth-child(2){order:2}  /* ภารกิจ → กลาง */
-main > section:nth-child(3){order:1}  /* ปฏิทิน → ซ้ายสุด */
 main{
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr);
-  gap: 24px;
+  display: flex;
   align-items: stretch;
   flex: 1;
   min-height: 0;
 }
+
+.col-resizer{
+  flex: 0 0 24px;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+.col-resizer::after{
+  content: '';
+  width: 4px;
+  height: 40px;
+  border-radius: 2px;
+  background: var(--line);
+  transition: background 0.15s;
+}
+.col-resizer:hover::after,
+.col-resizer.dragging::after{
+  background: var(--accent);
+}
+
+main > section{flex: 0 0 auto; min-width: 220px}
+#panelDashboard{flex: 1 1 240px}
+
 
 .left-column{
   display: flex;
@@ -625,9 +645,9 @@ dialog input:focus{outline:0;border-color:var(--accent)}
 .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
 
 @media (max-width:900px){
-  main{grid-template-columns:1fr;flex:none}
-  main > section{order:0 !important}
-  main > section{height:auto;overflow:visible}
+  main{flex-direction:column; flex:none}
+  main > section{width:auto !important; flex:none !important; height:auto;overflow:visible}
+  .col-resizer{display:none}
   .clock{font-size:38px}
   .wrap{padding:0 16px 62px;height:auto;display:block}
   .topbar{padding-top:14px}
@@ -705,7 +725,7 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
   <div class="topbar">
     <header>
       <div class="header-actions">
-        <button class="sys-btn" id="pushTestBtn" type="button">🔔 </button>
+        <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบแจ้งเตือน</button>
         <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
         <button class="color-btn" id="colorBtn" type="button" title="เปลี่ยนสี" aria-label="เปลี่ยนสีหลัก"><i></i></button>
         <div class="color-pop" id="colorPop" hidden></div>
@@ -726,55 +746,21 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
   </div>
 
   <main>
-    <!-- 1) แดชบอร์ด -->
-    <section aria-label="แดชบอร์ดความสำเร็จ">
-        <h2>แดชบอร์ดความสำเร็จ</h2>
-        
-        <div class="stat-card">
-          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
-            <span>ความสำเร็จรายวัน</span>
-            <span id="stat-daily-val" style="color: var(--accent);">0%</span>
-          </div>
-          <div class="stat-bar-bg">
-            <div id="stat-daily-bar" class="stat-bar-fill" style="width: 0%; background: var(--success);"></div>
-          </div>
+    <!-- 1) ปฏิทิน -->
+    <section id="panelCalendar" aria-label="ปฏิทิน">
+        <div class="calendar-header">
+          <button type="button" id="prevMonth" aria-label="เดือนก่อนหน้า">&lt;</button>
+          <h3 id="calTitle" style="margin:0;font-size:16px;font-weight:600;"></h3>
+          <button type="button" id="nextMonth" aria-label="เดือนถัดไป">&gt;</button>
         </div>
-
-        <div class="stat-card">
-          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
-            <span id="stat-monthly-label">ความสำเร็จรายเดือน</span>
-            <span id="stat-monthly-val" style="color: var(--accent);">0%</span>
-          </div>
-          <div class="stat-bar-bg">
-            <div id="stat-monthly-bar" class="stat-bar-fill" style="width: 0%; background: var(--accent);"></div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
-            <span id="stat-yearly-label">ความสำเร็จรายปี</span>
-            <span id="stat-yearly-val" style="color: var(--accent);">0%</span>
-          </div>
-          <div class="stat-bar-bg">
-            <div id="stat-yearly-bar" class="stat-bar-fill" style="width: 0%; background: var(--warning);"></div>
-          </div>
-        </div>
-
-        <!-- รายละเอียดความคืบหน้ารายเดือนแบบไล่ระดับ -->
-        <div style="margin-top: 16px;">
-          <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--mute); margin-bottom: 10px;">ความคืบหน้ารายเดือน (ภาพรวมทั้งปี)</h3>
-          <div id="yearly-monthly-bars" style="display: flex; flex-direction: column; gap: 10px; ">
-            <!-- เรนเดอร์ด้วย JavaScript -->
-          </div>
-        </div>
-
-        <div style="margin-top: 16px; padding: 12px; border-radius: 12px; background: var(--panel); box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); text-align: center; font-size: 12px; color: var(--mute);">
-          <p style="margin: 0 0 4px 0;">"fc เอ็มออนิว"</p>
-        </div>
+        <div class="calendar-grid" id="calGrid"></div>
+        <div id="selectedDateSummary" class="agenda"></div>
       </section>
 
+    <div class="col-resizer" id="resizer1" role="separator" aria-orientation="vertical" aria-label="ปรับความกว้างปฏิทิน" tabindex="0"></div>
+
     <!-- 2) รายการที่ต้องทำ -->
-    <section class="todo" aria-label="รายการงาน">
+    <section id="panelTodo" class="todo" aria-label="รายการงาน">
         <h2>ภารกิจของฉัน <span class="count" id="count"></span></h2>
         
         <div class="system-status">
@@ -826,15 +812,53 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
         <div class="foot"><span id="left"></span><button type="button" id="clearDone">ลบที่เสร็จแล้ว</button></div>
       </section>
 
-    <!-- 3) ปฏิทิน -->
-    <section aria-label="ปฏิทิน">
-        <div class="calendar-header">
-          <button type="button" id="prevMonth" aria-label="เดือนก่อนหน้า">&lt;</button>
-          <h3 id="calTitle" style="margin:0;font-size:16px;font-weight:600;"></h3>
-          <button type="button" id="nextMonth" aria-label="เดือนถัดไป">&gt;</button>
+    <div class="col-resizer" id="resizer2" role="separator" aria-orientation="vertical" aria-label="ปรับความกว้างรายการงาน" tabindex="0"></div>
+
+    <!-- 3) แดชบอร์ด -->
+    <section id="panelDashboard" aria-label="แดชบอร์ดความสำเร็จ">
+        <h2>แดชบอร์ดความสำเร็จ</h2>
+        
+        <div class="stat-card">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+            <span>ความสำเร็จรายวัน</span>
+            <span id="stat-daily-val" style="color: var(--accent);">0%</span>
+          </div>
+          <div class="stat-bar-bg">
+            <div id="stat-daily-bar" class="stat-bar-fill" style="width: 0%; background: var(--success);"></div>
+          </div>
         </div>
-        <div class="calendar-grid" id="calGrid"></div>
-        <div id="selectedDateSummary" class="agenda"></div>
+
+        <div class="stat-card">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+            <span id="stat-monthly-label">ความสำเร็จรายเดือน</span>
+            <span id="stat-monthly-val" style="color: var(--accent);">0%</span>
+          </div>
+          <div class="stat-bar-bg">
+            <div id="stat-monthly-bar" class="stat-bar-fill" style="width: 0%; background: var(--accent);"></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+            <span id="stat-yearly-label">ความสำเร็จรายปี</span>
+            <span id="stat-yearly-val" style="color: var(--accent);">0%</span>
+          </div>
+          <div class="stat-bar-bg">
+            <div id="stat-yearly-bar" class="stat-bar-fill" style="width: 0%; background: var(--warning);"></div>
+          </div>
+        </div>
+
+        <!-- รายละเอียดความคืบหน้ารายเดือนแบบไล่ระดับ -->
+        <div style="margin-top: 16px;">
+          <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--mute); margin-bottom: 10px;">ความคืบหน้ารายเดือน (ภาพรวมทั้งปี)</h3>
+          <div id="yearly-monthly-bars" style="display: flex; flex-direction: column; gap: 10px; ">
+            <!-- เรนเดอร์ด้วย JavaScript -->
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; padding: 12px; border-radius: 12px; background: var(--panel); box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); text-align: center; font-size: 12px; color: var(--mute);">
+          <p style="margin: 0 0 4px 0;">"fc เอ็มออนิว"</p>
+        </div>
       </section>
   </main>
 
@@ -1436,6 +1460,77 @@ function setTodoTimeUI(value) {
   $('#customTimeWrap').style.display = matchesChip ? 'none' : 'flex';
 }
 
+/* ---------- ปรับความกว้าง 3 คอลัมน์ (ปฏิทิน / ภารกิจ / แดชบอร์ด) ด้วยเมาส์ ---------- */
+function initResizablePanels() {
+  const mainEl = document.querySelector('main');
+  const calEl = $('#panelCalendar');
+  const todoEl = $('#panelTodo');
+  const RESIZER_TOTAL = 48; // ความกว้างรวมของ resizer 2 อัน
+  const MIN_PANEL = 220;
+  const MIN_DASHBOARD = 220;
+
+  const stored = load('panelWidths', null);
+  if (stored && stored.calendar && stored.todo) {
+    calEl.style.width = stored.calendar + 'px';
+    todoEl.style.width = stored.todo + 'px';
+  } else {
+    const total = mainEl.getBoundingClientRect().width - RESIZER_TOTAL;
+    const unit = total / 5; // สัดส่วนเดิม 2 : 2 : 1
+    calEl.style.width = Math.max(MIN_PANEL, unit * 2) + 'px';
+    todoEl.style.width = Math.max(MIN_PANEL, unit * 2) + 'px';
+  }
+
+  function persistWidths() {
+    save('panelWidths', {
+      calendar: Math.round(calEl.getBoundingClientRect().width),
+      todo: Math.round(todoEl.getBoundingClientRect().width)
+    });
+  }
+
+  function setupResizer(resizerEl, panelEl, otherEl) {
+    function clampWidth(newWidth) {
+      const mainWidth = mainEl.getBoundingClientRect().width;
+      const otherWidth = otherEl.getBoundingClientRect().width;
+      const maxWidth = mainWidth - RESIZER_TOTAL - otherWidth - MIN_DASHBOARD;
+      return Math.max(MIN_PANEL, Math.min(newWidth, maxWidth));
+    }
+
+    resizerEl.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      resizerEl.setPointerCapture(e.pointerId);
+      const startX = e.clientX;
+      const startWidth = panelEl.getBoundingClientRect().width;
+      resizerEl.classList.add('dragging');
+      document.body.style.userSelect = 'none';
+
+      function onMove(ev) {
+        panelEl.style.width = clampWidth(startWidth + (ev.clientX - startX)) + 'px';
+      }
+      function onUp() {
+        resizerEl.releasePointerCapture(e.pointerId);
+        resizerEl.removeEventListener('pointermove', onMove);
+        resizerEl.removeEventListener('pointerup', onUp);
+        resizerEl.classList.remove('dragging');
+        document.body.style.userSelect = '';
+        persistWidths();
+      }
+      resizerEl.addEventListener('pointermove', onMove);
+      resizerEl.addEventListener('pointerup', onUp);
+    });
+
+    resizerEl.addEventListener('keydown', e => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const step = e.key === 'ArrowRight' ? 20 : -20;
+      panelEl.style.width = clampWidth(panelEl.getBoundingClientRect().width + step) + 'px';
+      persistWidths();
+    });
+  }
+
+  setupResizer($('#resizer1'), calEl, todoEl);
+  setupResizer($('#resizer2'), todoEl, calEl);
+}
+
 function getDayOfWeekIndex(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number);
   return new Date(y, m - 1, d).getDay();
@@ -1942,6 +2037,7 @@ function renderAll() {
 renderLinks();
 renderAll();
 initTimePicker();
+initResizablePanels();
 
 </script>
 </body>
