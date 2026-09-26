@@ -276,13 +276,26 @@ h2{
   border: 1.5px solid var(--accent);
   font-weight: 600;
 }
-.calendar-day.has-event::after {
-  content: '';
+.day-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 2px;
+  height: 5px;
+}
+.day-dot {
   width: 5px;
   height: 5px;
-  background-color: var(--accent);
   border-radius: 50%;
-  margin-top: 2px;
+  background-color: var(--accent);
+  flex-shrink: 0;
+}
+.day-dot-more {
+  font-size: 8px;
+  line-height: 1;
+  color: var(--accent);
+  font-weight: 600;
 }
 
 /* Tiles */
@@ -1430,8 +1443,25 @@ function renderCalendar() {
       dayDiv.style.color = 'var(--accent-ink)';
     }
 
-    const hasEvents = getTasksForDate(currStr).length > 0;
-    if (hasEvents) dayDiv.classList.add('has-event');
+    const dayTaskCount = getTasksForDate(currStr).length;
+    if (dayTaskCount > 0) {
+      const dotsDiv = document.createElement('div');
+      dotsDiv.className = 'day-dots';
+      const isOverflow = dayTaskCount > 3;
+      const dotCount = isOverflow ? 2 : dayTaskCount;
+      for (let i = 0; i < dotCount; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'day-dot';
+        dotsDiv.appendChild(dot);
+      }
+      if (isOverflow) {
+        const more = document.createElement('span');
+        more.className = 'day-dot-more';
+        more.textContent = `+${dayTaskCount - 2}`;
+        dotsDiv.appendChild(more);
+      }
+      dayDiv.appendChild(dotsDiv);
+    }
 
     dayDiv.onclick = () => {
       selectedCalendarDate = currStr;
