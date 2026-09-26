@@ -404,6 +404,56 @@ h2{
 .todo input:focus, .todo select:focus{
   border-color: var(--accent);
 }
+.time-chip{
+  border: 1.5px solid color-mix(in srgb, var(--accent) 65%, transparent);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+}
+.time-chip.selected{
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+.time-chip.custom-toggle{
+  background: transparent;
+  box-shadow: none;
+  border-style: dashed;
+  color: var(--accent);
+}
+.time-chip-wrap{
+  position: relative;
+  display: inline-flex;
+}
+.time-chip-wrap .chip-del{
+  display: none;
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+#timeChips.managing .time-chip-wrap .chip-del{
+  display: block;
+}
+#customTimeWrap select{
+  width: auto;
+  flex: 1;
+  margin-bottom: 0;
+}
 
 .btn{
   border:0;
@@ -655,7 +705,7 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
   <div class="topbar">
     <header>
       <div class="header-actions">
-        <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบแจ้งเตือน</button>
+        <button class="sys-btn" id="pushTestBtn" type="button">🔔 </button>
         <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
         <button class="color-btn" id="colorBtn" type="button" title="เปลี่ยนสี" aria-label="เปลี่ยนสีหลัก"><i></i></button>
         <div class="color-pop" id="colorPop" hidden></div>
@@ -739,7 +789,19 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
           <input type="text" id="todoInput" placeholder="  วันนี้ทำอะไรดี " maxlength="200" required aria-label="เพิ่มงานใหม่">
           <div style="display:flex; gap:8px;">
             <input type="date" id="todoDate" aria-label="วันที่เริ่มต้น" style="flex:1; min-width:0">
-            <input type="time" id="todoTime" value="09:00" aria-label="เวลา" style="flex:0 0 132px; min-width:0">
+          </div>
+          <input type="hidden" id="todoTime" value="09:00">
+          <div style="margin-bottom:8px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+              <div id="timeChips" style="display:flex; flex-wrap:wrap; gap:10px 6px;"></div>
+              <button type="button" id="manageChipsToggle" title="แก้ไข/ลบเวลาด่วน" style="flex:0 0 auto; background:none; border:none; color:var(--mute); font-size:13px; cursor:pointer; padding:2px 4px; margin-left:6px;">แก้ไข</button>
+            </div>
+            <div id="customTimeWrap" style="display:none; gap:8px; align-items:center; flex-wrap:wrap;">
+              <select id="todoTimeHour" aria-label="ชั่วโมง"></select>
+              <span style="color:var(--mute)">:</span>
+              <select id="todoTimeMinute" aria-label="นาที"></select>
+              <button type="button" id="addChipFromCustom" style="background:none; border:1.5px dashed var(--accent); color:var(--accent); border-radius:8px; font-size:11px; padding:5px 10px; cursor:pointer;">+ บันทึกเป็นเวลาด่วน</button>
+            </div>
           </div>
           <select id="todoRepeat" onchange="toggleRepeatEnd()">
             <option value="today">วันนี้</option>
@@ -809,6 +871,7 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
 
 <script>
 const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
 const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
@@ -1257,6 +1320,120 @@ $('#linkForm').addEventListener('submit', e => {
 function toggleRepeatEnd() {
   const repeat = $('#todoRepeat').value;
   $('#repeatEndWrap').style.display = (repeat === 'custom') ? 'block' : 'none';
+}
+
+/* ---------- ตัวเลือกเวลา: chip ด่วน (แก้ไข/ลบได้) + dropdown กำหนดเอง ---------- */
+let quickTimes = load('quickTimeChips', ['09:00', '12:00', '18:00', '21:00']);
+let chipsManaging = false;
+
+function initTimePicker() {
+  const hourSel = $('#todoTimeHour');
+  const minuteSel = $('#todoTimeMinute');
+  for (let h = 0; h < 24; h++) {
+    const opt = document.createElement('option');
+    opt.value = pad2(h);
+    opt.textContent = pad2(h);
+    hourSel.appendChild(opt);
+  }
+  for (let m = 0; m < 60; m += 5) {
+    const opt = document.createElement('option');
+    opt.value = pad2(m);
+    opt.textContent = pad2(m);
+    minuteSel.appendChild(opt);
+  }
+
+  hourSel.onchange = minuteSel.onchange = () => {
+    syncTimeValue(`${hourSel.value}:${minuteSel.value}`);
+  };
+
+  $('#manageChipsToggle').onclick = () => {
+    chipsManaging = !chipsManaging;
+    $('#manageChipsToggle').textContent = chipsManaging ? 'เสร็จสิ้น' : 'แก้ไข';
+    $('#timeChips').classList.toggle('managing', chipsManaging);
+  };
+
+  $('#addChipFromCustom').onclick = () => {
+    const value = `${hourSel.value}:${minuteSel.value}`;
+    if (!quickTimes.includes(value)) {
+      quickTimes.push(value);
+      quickTimes.sort();
+      save('quickTimeChips', quickTimes);
+      renderTimeChips();
+    }
+    syncTimeValue(value);
+    $('#customTimeWrap').style.display = 'none';
+  };
+
+  renderTimeChips();
+  setTodoTimeUI($('#todoTime').value);
+}
+
+function renderTimeChips() {
+  const container = $('#timeChips');
+  container.classList.toggle('managing', chipsManaging);
+  container.textContent = '';
+  const currentValue = $('#todoTime').value;
+
+  quickTimes.forEach(t => {
+    const wrap = document.createElement('span');
+    wrap.className = 'time-chip-wrap';
+
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'time-chip';
+    chip.dataset.time = t;
+    chip.textContent = t;
+    chip.classList.toggle('selected', t === currentValue);
+    chip.onclick = () => {
+      if (chipsManaging) return;
+      syncTimeValue(t);
+      $('#customTimeWrap').style.display = 'none';
+    };
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'chip-del';
+    del.setAttribute('aria-label', `ลบเวลาด่วน ${t}`);
+    del.textContent = '×';
+    del.onclick = () => {
+      if (!confirm(`ลบเวลาด่วน ${t} ออกไหม?`)) return;
+      quickTimes = quickTimes.filter(x => x !== t);
+      save('quickTimeChips', quickTimes);
+      renderTimeChips();
+    };
+
+    wrap.append(chip, del);
+    container.appendChild(wrap);
+  });
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'time-chip custom-toggle';
+  toggle.id = 'customTimeToggle';
+  toggle.textContent = 'กำหนดเอง';
+  toggle.onclick = () => {
+    const wrap = $('#customTimeWrap');
+    wrap.style.display = (wrap.style.display === 'flex') ? 'none' : 'flex';
+  };
+  container.appendChild(toggle);
+}
+
+// อัปเดตค่าเวลาจริง (#todoTime) และไฮไลต์ chip ที่ตรงกัน ไม่ยุ่งกับการเปิด/ปิดกล่องกำหนดเอง
+function syncTimeValue(value) {
+  $('#todoTime').value = value;
+  const [h, m] = value.split(':');
+  $$('#timeChips .time-chip:not(.custom-toggle)').forEach(chip => {
+    chip.classList.toggle('selected', chip.dataset.time === value);
+  });
+  $('#todoTimeHour').value = h;
+  $('#todoTimeMinute').value = pad2(Math.round(Number(m) / 5) * 5 % 60);
+}
+
+// เรียกตอนโหลดหน้า/แก้ไขงาน: sync ค่า + เปิดกล่องกำหนดเองอัตโนมัติถ้าเวลานั้นไม่ตรงกับ chip ใดเลย
+function setTodoTimeUI(value) {
+  syncTimeValue(value);
+  const matchesChip = quickTimes.includes(value);
+  $('#customTimeWrap').style.display = matchesChip ? 'none' : 'flex';
 }
 
 function getDayOfWeekIndex(dateStr) {
@@ -1729,6 +1906,7 @@ function startEditTask(id) {
   $('#todoInput').value = t.title;
   $('#todoDate').value = t.date;
   $('#todoTime').value = t.time;
+  setTodoTimeUI(t.time);
   const repeatValue = mapRepeatToNewOption(t.repeat);
   $('#todoRepeat').value = repeatValue;
   $('#todoRepeatEnd').value = (repeatValue === 'custom' && t.repeatEnd) ? t.repeatEnd : '';
@@ -1763,6 +1941,8 @@ function renderAll() {
 
 renderLinks();
 renderAll();
+initTimePicker();
+
 </script>
 </body>
 </html>
