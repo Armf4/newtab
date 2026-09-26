@@ -52,9 +52,10 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.wrap{max-width:2000px;margin:0 auto;padding:16px 28px 62px;height:100vh;height:100dvh;display:flex;flex-direction:column}
+.wrap{max-width:2000px;margin:0 auto;padding:0 28px 62px;height:100vh;height:100dvh;display:flex;flex-direction:column}
 header{flex-shrink:0}
 form.search{flex-shrink:0;width:100%}
+.topbar{position:sticky;top:0;z-index:5;flex-shrink:0;background:var(--bg);padding-top:16px}
 
 header{
   display: flex;
@@ -565,7 +566,8 @@ dialog input:focus{outline:0;border-color:var(--accent)}
   main > section{order:0 !important}
   main > section{height:auto;overflow:visible}
   .clock{font-size:38px}
-  .wrap{padding:14px 16px 62px;height:auto;display:block}
+  .wrap{padding:0 16px 62px;height:auto;display:block}
+  .topbar{padding-top:14px}
   .header-actions{position:static;margin-bottom:12px;justify-content:center}
   header{align-items:stretch}
 }
@@ -637,26 +639,28 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
 <div class="wrap">
-  <header>
-    <div class="header-actions">
-      <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบแจ้งเตือน</button>
-      <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
-      <button class="color-btn" id="colorBtn" type="button" title="เปลี่ยนสี" aria-label="เปลี่ยนสีหลัก"><i></i></button>
-      <div class="color-pop" id="colorPop" hidden></div>
-      <button class="color-btn" id="bgBtn" type="button" title="เปลี่ยนอนิเมชั่นพื้นหลัง" aria-label="เลือกอนิเมชั่นพื้นหลัง"><span id="bgIcon" style="display:grid;place-items:center;width:18px;height:18px;color:var(--accent)"></span></button>
-      <div class="bg-pop" id="bgPop" hidden></div>
-    </div>
-    <div class="clock-container">
-      <div class="clock" id="clock">00:00</div>
-      <div class="date" id="date"></div>
-    </div>
-  </header>
+  <div class="topbar">
+    <header>
+      <div class="header-actions">
+        <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบแจ้งเตือน</button>
+        <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
+        <button class="color-btn" id="colorBtn" type="button" title="เปลี่ยนสี" aria-label="เปลี่ยนสีหลัก"><i></i></button>
+        <div class="color-pop" id="colorPop" hidden></div>
+        <button class="color-btn" id="bgBtn" type="button" title="เปลี่ยนอนิเมชั่นพื้นหลัง" aria-label="เลือกอนิเมชั่นพื้นหลัง"><span id="bgIcon" style="display:grid;place-items:center;width:18px;height:18px;color:var(--accent)"></span></button>
+        <div class="bg-pop" id="bgPop" hidden></div>
+      </div>
+      <div class="clock-container">
+        <div class="clock" id="clock">00:00</div>
+        <div class="date" id="date"></div>
+      </div>
+    </header>
 
-  <form class="search" action="https://www.google.com/search" method="get">
-    <input id="q" name="q" type="search" placeholder="ค้นหาด้วย Google" autocomplete="off" autofocus aria-label="ค้นหาด้วย Google">
-    <kbd>/</kbd>
-    <button type="submit">ค้นหา</button>
-  </form>
+    <form class="search" action="https://www.google.com/search" method="get">
+      <input id="q" name="q" type="search" placeholder="ค้นหาด้วย Google" autocomplete="off" autofocus aria-label="ค้นหาด้วย Google">
+      <kbd>/</kbd>
+      <button type="submit">ค้นหา</button>
+    </form>
+  </div>
 
   <main>
     <!-- 1) แดชบอร์ด -->
@@ -725,12 +729,13 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
             <input type="time" id="todoTime" value="09:00" aria-label="เวลา" style="flex:0 0 132px; min-width:0">
           </div>
           <select id="todoRepeat" onchange="toggleRepeatEnd()">
-            <option value="once">ทำครั้งเดียว (เฉพาะวันที่เลือก)</option>
-            <option value="everyday">ทุกวัน</option>
-            <option value="weekly">รายสัปดาห์</option>
+            <option value="today">วันนี้</option>
+            <option value="week">สัปดาห์นี้</option>
+            <option value="month">เดือนนี้</option>
+            <option value="custom">ถึงวันที่กำหนด</option>
           </select>
           <div id="repeatEndWrap" style="display:none; margin-bottom:8px;">
-            <label style="font-size:11px; color:var(--mute); margin-bottom:2px;">วันที่สิ้นสุดการทำซ้ำ (ไม่บังคับ)</label>
+            <label style="font-size:11px; color:var(--mute); margin-bottom:2px;">วันที่สิ้นสุด (เว้นว่าง = ไม่มีกำหนด)</label>
             <input type="date" id="todoRepeatEnd">
           </div>
           <button class="btn" type="submit" id="submitTaskBtn" style="width:100%">เพิ่มภารกิจ</button>
@@ -1238,7 +1243,7 @@ $('#linkForm').addEventListener('submit', e => {
 /* ---------- ระบบ Todo & ปฏิทิน ---------- */
 function toggleRepeatEnd() {
   const repeat = $('#todoRepeat').value;
-  $('#repeatEndWrap').style.display = (repeat === 'once') ? 'none' : 'block';
+  $('#repeatEndWrap').style.display = (repeat === 'custom') ? 'block' : 'none';
 }
 
 function getDayOfWeekIndex(dateStr) {
@@ -1246,10 +1251,44 @@ function getDayOfWeekIndex(dateStr) {
   return new Date(y, m - 1, d).getDay();
 }
 
+function dateObjToStr(d) {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+// วันสุดท้ายของสัปดาห์ (สัปดาห์เริ่มวันจันทร์ จบวันอาทิตย์) ของวันที่ที่กำหนด
+function endOfWeekStr(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  const dow = (dt.getDay() + 6) % 7; // จ=0 ... อา=6
+  dt.setDate(dt.getDate() + (6 - dow));
+  return dateObjToStr(dt);
+}
+
+// วันสุดท้ายของเดือนของวันที่ที่กำหนด
+function endOfMonthStr(dateStr) {
+  const [y, m] = dateStr.split('-').map(Number);
+  return dateObjToStr(new Date(y, m, 0));
+}
+
+// คำนวณวันสิ้นสุดจริงตามตัวเลือกที่ผู้ใช้เลือก
+function computeRepeatEnd(type, startDateStr, customEnd) {
+  if (type === 'today') return startDateStr;
+  if (type === 'week') return endOfWeekStr(startDateStr);
+  if (type === 'month') return endOfMonthStr(startDateStr);
+  if (type === 'custom') return customEnd || null; // ไม่ระบุ = ไม่มีกำหนด
+  return startDateStr;
+}
+
 function repeatLabel(task) {
+  // ค่าเก่า (รองรับข้อมูลเดิมที่เคยบันทึกไว้)
   if (task.repeat === 'once') return 'ครั้งเดียว';
   if (task.repeat === 'everyday') return 'ทุกวัน';
   if (task.repeat === 'weekly') return 'รายสัปดาห์';
+  // ค่าใหม่
+  if (task.repeat === 'today') return 'วันนี้';
+  if (task.repeat === 'week') return `สัปดาห์นี้ (ถึง ${task.repeatEnd})`;
+  if (task.repeat === 'month') return `เดือนนี้ (ถึง ${task.repeatEnd})`;
+  if (task.repeat === 'custom') return task.repeatEnd ? `ถึงวันที่ ${task.repeatEnd}` : 'ไม่มีกำหนด';
   return task.repeat;
 }
 
@@ -1258,9 +1297,12 @@ function getTasksForDate(dateStr) {
     if (t.excludedDates && t.excludedDates.includes(dateStr)) return false;
     if (t.date > dateStr) return false;
     if (t.repeatEnd && t.repeatEnd < dateStr) return false;
+    // ค่าเก่า (รองรับข้อมูลเดิมที่เคยบันทึกไว้)
     if (t.repeat === 'once') return t.date === dateStr;
     if (t.repeat === 'everyday') return true;
     if (t.repeat === 'weekly') return getDayOfWeekIndex(t.date) === getDayOfWeekIndex(dateStr);
+    // ค่าใหม่: วันนี้ / สัปดาห์นี้ / เดือนนี้ / ถึงวันที่กำหนด ทำงานทุกวันในช่วงที่คำนวณไว้แล้ว (date..repeatEnd)
+    if (t.repeat === 'today' || t.repeat === 'week' || t.repeat === 'month' || t.repeat === 'custom') return true;
     return false;
   }).sort((a, b) => a.time.localeCompare(b.time));
 }
@@ -1319,8 +1361,8 @@ function closeDeleteModal() {
 }
 
 function requestDeleteTask(task, dateStr) {
-  // ภารกิจแบบครั้งเดียวมีอยู่วันเดียวอยู่แล้ว ลบตรงได้เลยไม่ต้องถาม
-  if (task.repeat === 'once') {
+  // ภารกิจที่มีอยู่วันเดียวอยู่แล้ว (ครั้งเดียว หรือ "วันนี้") ลบตรงได้เลยไม่ต้องถาม
+  if (task.repeat === 'once' || task.repeat === 'today') {
     deleteTaskEntirely(task.id);
     return;
   }
@@ -1605,7 +1647,8 @@ function addOrUpdateTask(e) {
   const date = $('#todoDate').value || getTodayStr();
   const time = $('#todoTime').value || '09:00';
   const repeat = $('#todoRepeat').value;
-  const repeatEnd = $('#todoRepeatEnd').value || null;
+  const customEnd = $('#todoRepeatEnd').value || null;
+  const repeatEnd = computeRepeatEnd(repeat, date, customEnd);
 
   if (!title) return;
 
@@ -1634,10 +1677,19 @@ function addOrUpdateTask(e) {
   }
 
   $('#todoInput').value = '';
+  $('#todoRepeat').value = 'today';
   $('#todoRepeatEnd').value = '';
   $('#repeatEndWrap').style.display = 'none';
   persist();
   renderAll();
+}
+
+// แปลงค่าตัวเลือกแบบเก่า (once/everyday/weekly) ให้ตรงกับตัวเลือกใหม่ 4 แบบ เวลาเปิดแก้ไขภารกิจเก่า
+function mapRepeatToNewOption(repeat) {
+  if (repeat === 'once') return 'today';
+  if (repeat === 'everyday') return 'custom';
+  if (repeat === 'weekly') return 'week';
+  return repeat;
 }
 
 function startEditTask(id) {
@@ -1647,8 +1699,9 @@ function startEditTask(id) {
   $('#todoInput').value = t.title;
   $('#todoDate').value = t.date;
   $('#todoTime').value = t.time;
-  $('#todoRepeat').value = t.repeat;
-  $('#todoRepeatEnd').value = t.repeatEnd || '';
+  const repeatValue = mapRepeatToNewOption(t.repeat);
+  $('#todoRepeat').value = repeatValue;
+  $('#todoRepeatEnd').value = (repeatValue === 'custom' && t.repeatEnd) ? t.repeatEnd : '';
   toggleRepeatEnd();
   $('#submitTaskBtn').textContent = 'บันทึกการแก้ไข';
   $('#todoInput').focus();
