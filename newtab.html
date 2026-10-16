@@ -950,7 +950,15 @@ ACCENTS.forEach(c => {
   b.onclick = () => setAccent(c);
   $('#colorPop').appendChild(b);
 });
-setAccent(load('accent', ACCENTS[0]));
+/* สุ่มสีหลักใหม่ทุกครั้งที่โหลดหน้า (ไม่ซ้ำกับครั้งก่อน) */
+function pickRandom(list, lastKey) {
+  const last = load(lastKey, null);
+  const pool = list.length > 1 ? list.filter(x => x !== last) : list;
+  const v = pool[Math.floor(Math.random() * pool.length)];
+  save(lastKey, v);
+  return v;
+}
+setAccent(pickRandom(ACCENTS, 'lastRandomAccent'));
 $('#colorBtn').onclick = e => { e.stopPropagation(); $('#bgPop').hidden = true; $('#colorPop').hidden = !$('#colorPop').hidden; };
 document.addEventListener('click', e => {
   if (!e.target.closest('#colorPop')) $('#colorPop').hidden = true;
@@ -982,8 +990,10 @@ function updateBgIcon() {
 }
 const bgCanvas = $('#bg');
 const bctx = bgCanvas.getContext('2d');
-let bgMode = load('bgMode2', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'none' : 'rain');
-if (!BG_MODES.some(m => m.id === bgMode)) bgMode = 'rain';
+/* สุ่มสภาพอากาศพื้นหลังใหม่ทุกครั้งที่โหลดหน้า (ไม่ซ้ำกับครั้งก่อน) */
+let bgMode = matchMedia('(prefers-reduced-motion: reduce)').matches
+  ? 'none'
+  : pickRandom(BG_MODES.map(m => m.id).filter(id => id !== 'none'), 'lastRandomBg');
 let bgW = 0, bgH = 0, bgRAF = 0, bgLast = 0, bgFrame = 0, bgState = {};
 let bgAccent = { h: 262, s: 90, l: 66 }, bgDark = true;
 const rnd = (a, b) => a + Math.random() * (b - a);
