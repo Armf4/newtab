@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>หน้าเริ่มต้นของฉัน</title>
 <link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22%3E%3Ccircle%20cx=%2250%22%20cy=%2250%22%20r=%2240%22%20fill=%22none%22%20stroke=%22%23EF4444%22%20stroke-width=%2211%22/%3E%3Cpath%20d=%22M50%2027V50L66%2060%22%20fill=%22none%22%20stroke=%22%23EF4444%22%20stroke-width=%2211%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="theme-color" content="#8B5CF6">
 <style>
@@ -377,34 +378,131 @@ h2{
 }
 .add-tile b{font-size:24px;font-weight:300;line-height:1}
 
-/* แถบทางลัดด้านล่าง */
-.dock{
-  position:fixed;left:50%;bottom:8px;transform:translateX(-50%);z-index:10;
-  display:flex;align-items:center;gap:4px;
-  max-width:calc(100vw - 32px);overflow-x:auto;overflow-y:hidden;
-  padding:5px 8px;
-  background:var(--glass-bg);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--line);border-radius:14px;
-  box-shadow:4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
-  scrollbar-width:none;
+/* ปุ่ม 3 ขีด (มุมบนซ้าย) */
+.menu-btn{
+  position:absolute;top:0;left:0;
+  width:42px;height:42px;padding:0;border:none;border-radius:12px;
+  display:grid;place-items:center;background:var(--panel);
+  box-shadow:6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+  transition:all .2s;
 }
-.dock::-webkit-scrollbar{display:none}
-.dock .tile{
-  flex:0 0 auto;flex-direction:row;gap:7px;padding:4px 10px 4px 6px;
-  background:transparent;box-shadow:none;border-radius:10px;
+.menu-btn:active{box-shadow:inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light)}
+
+/* แถบด้านข้าง (ทางลัด) */
+.side-scrim{
+  position:fixed;inset:0;z-index:49;background:rgba(0,0,0,.3);
+  opacity:0;pointer-events:none;transition:opacity .35s;
 }
-.dock .tile:hover{background:var(--line);transform:none;box-shadow:none}
-.dock .ico{width:24px;height:24px;border-radius:7px;font-size:12px}
-.dock .ico span{font-size:12px}
-.dock .tile span.n{font-size:12px;color:var(--ink);max-width:110px}
-.dock .tile .del{top:50%;right:2px;transform:translateY(-50%);width:16px;height:16px;font-size:12px;background:var(--panel)}
-.dock .add-tile{
-  flex:0 0 auto;flex-direction:row;gap:5px;min-height:0;padding:5px 10px;
-  border:1px dashed var(--line);box-shadow:none;background:transparent;font-size:12px;
+.side-scrim.show{opacity:1;pointer-events:auto}
+.side{
+  position:fixed;top:12px;left:12px;bottom:12px;z-index:50;
+  width:min(320px,calc(100vw - 24px));
+  display:flex;flex-direction:column;overflow:hidden;border-radius:26px;
+  background:var(--panel);border:1px solid var(--line);
+  box-shadow:0 20px 50px rgba(0,0,0,.25), 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+  transform:translateX(calc(-100% - 24px));opacity:0;visibility:hidden;
+  transition:transform .45s cubic-bezier(.32,.72,0,1), opacity .3s, visibility 0s .45s;
 }
-.dock .add-tile:hover{background:var(--line)}
-.dock .add-tile b{font-size:16px}
+.side.open{transform:none;opacity:1;visibility:visible;transition-delay:0s}
+.side > *{position:relative;z-index:1}
+
+/* โหมด Liquid Glass (ใส) */
+.side.glass{
+  background:rgba(255,255,255,.22);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);
+  border:1px solid rgba(255,255,255,.6);
+  box-shadow:0 24px 60px rgba(60,70,120,.28), inset 0 1px 1px rgba(255,255,255,.9), inset 0 -1px 1px rgba(255,255,255,.4);
+}
+:root[data-theme=dark] .side.glass{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.16);
+  box-shadow:0 24px 60px rgba(0,0,0,.6), inset 0 1px 1px rgba(255,255,255,.32), inset 0 -1px 1px rgba(255,255,255,.05);
+}
+.side.glass::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(135deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 68%, rgba(255,255,255,.14) 100%);
+}
+:root[data-theme=dark] .side.glass::before{
+  background:linear-gradient(135deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 68%, rgba(255,255,255,.05) 100%);
+}
+
+.side-head{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 10px}
+.side-title{font-size:15px;font-weight:600;color:var(--ink)}
+.side-close{
+  width:32px;height:32px;border:0;border-radius:50%;background:transparent;
+  color:var(--mute);font-size:20px;line-height:1;display:grid;place-items:center;
+}
+.side-close:hover{background:color-mix(in srgb,var(--ink) 9%,transparent);color:var(--ink)}
+.side-list{flex:1;min-height:0;overflow-y:auto;padding:4px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.side .tile{
+  flex-direction:row;align-items:center;gap:12px;padding:10px 70px 10px 10px;
+  background:transparent;box-shadow:none;border-radius:16px;transition:background .2s;
+}
+.side .tile:hover{background:color-mix(in srgb,var(--ink) 9%,transparent);transform:none;box-shadow:none}
+.side .ico{width:34px;height:34px;border-radius:10px;font-size:15px;flex:0 0 auto}
+.side .ico span{font-size:15px}
+.side .tile span.n{flex:1;min-width:0;max-width:none;font-size:14px}
+.side .tile .del{top:50%;right:8px;transform:translateY(-50%);width:26px;height:26px;font-size:16px}
+@media (hover:none){.side .tile .del{opacity:.7}}
+.side .add-tile{
+  flex-direction:row;justify-content:center;gap:8px;min-height:0;padding:11px;
+  border:1px dashed color-mix(in srgb,var(--ink) 25%,transparent);background:transparent;box-shadow:none;
+  color:var(--mute);font-size:13px;
+}
+.side .add-tile:hover{background:color-mix(in srgb,var(--ink) 9%,transparent);color:var(--ink)}
+.side .add-tile b{font-size:18px}
+.side-foot{padding:12px 16px 16px;border-top:1px solid color-mix(in srgb,var(--ink) 10%,transparent)}
+.side-label{font-size:12px;color:var(--mute);margin-bottom:8px}
+.seg{display:flex;gap:3px;padding:3px;border-radius:12px;background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.seg button{flex:1;border:0;background:transparent;padding:7px 8px;border-radius:9px;font-size:12.5px;font-weight:500;color:var(--mute);transition:background .2s,color .2s}
+.seg button.on{background:color-mix(in srgb,var(--ink) 14%,transparent);color:var(--ink)}
+@media (max-width:900px){.menu-btn{position:static;align-self:flex-start;margin-bottom:10px}}
+
+/* โฟลเดอร์/หมวดในแถบทางลัด */
+.fold{--fc:var(--accent);border-radius:16px;margin-top:4px;transition:background .2s}
+.fold.plain{--fc:var(--mute)}
+.fold.over{background:color-mix(in srgb,var(--fc) 14%,transparent);outline:1.5px dashed color-mix(in srgb,var(--fc) 70%,transparent)}
+.fold-head{display:flex;align-items:center;gap:2px}
+.fold-toggle{
+  flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:0;background:transparent;
+  padding:7px 8px;border-radius:12px;text-align:left;font-size:13px;font-weight:600;
+  color:color-mix(in srgb,var(--fc) 78%,var(--ink));
+}
+.fold-toggle:hover{background:color-mix(in srgb,var(--fc) 12%,transparent)}
+.fold-toggle svg{flex:0 0 auto;color:var(--fc)}
+.fold-toggle .chev{color:var(--mute);transition:transform .2s}
+.fold:not(.collapsed) .chev{transform:rotate(90deg)}
+.fold-toggle .fn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fold-toggle .fcnt{margin-left:auto;font-size:11px;font-weight:500;color:var(--mute);padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--fc) 16%,transparent)}
+.fold-btn{width:28px;height:28px;flex:0 0 auto;border:0;border-radius:50%;background:transparent;color:var(--mute);display:grid;place-items:center;opacity:0}
+.fold-head:hover .fold-btn,.fold-btn:focus-visible{opacity:1}
+.fold-btn:hover{background:color-mix(in srgb,var(--fc) 16%,transparent);color:var(--ink)}
+@media (hover:none){.fold-btn{opacity:.8}}
+.fold-body{margin:2px 0 4px 17px;padding-left:6px;border-left:2px solid color-mix(in srgb,var(--fc) 55%,transparent);display:flex;flex-direction:column;gap:4px}
+.fold.collapsed .fold-body{display:none}
+.fold-empty{font-size:12px;color:var(--mute);padding:8px 10px}
+.fold .tile:hover{background:color-mix(in srgb,var(--fc) 14%,transparent)}
+.tile.dragging{opacity:.45}
+.side .tile .edit{
+  position:absolute;top:50%;right:38px;transform:translateY(-50%);width:26px;height:26px;
+  border:0;border-radius:6px;background:transparent;color:var(--mute);opacity:0;display:grid;place-items:center;
+}
+.side .tile:hover .edit,.side .tile .edit:focus-visible{opacity:1}
+.side .tile .edit:hover{background:var(--line);color:var(--ink)}
+@media (hover:none){.side .tile .edit{opacity:.7}}
+.side-actions{display:flex;gap:6px;margin-top:8px}
+.side-actions .add-tile{flex:1;padding:11px 8px}
+.side-actions .add-tile svg{flex:0 0 auto}
+dialog select{
+  width:100%;border:1.5px solid color-mix(in srgb, var(--accent) 65%, transparent);background:var(--panel);
+  border-radius:10px;padding:10px 14px;
+  box-shadow:inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+}
+dialog select:focus{outline:0;border-color:var(--accent)}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;padding:4px 0}
+.swatches button{width:30px;height:30px;padding:0;border-radius:50%;border:2px solid transparent;background:var(--sw);box-shadow:inset 0 0 0 2px var(--panel)}
+.swatches button.on{border-color:var(--ink)}
+#grpDel{margin-right:auto;color:var(--danger)}
 
 /* แถบเลื่อนสีเข้มให้เข้ากับธีม */
 :root[data-theme=dark]{color-scheme:dark}
@@ -724,6 +822,7 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
 <div class="wrap">
   <div class="topbar">
     <header>
+      <button class="menu-btn" id="menuBtn" type="button" title="ทางลัด" aria-label="เปิดแถบทางลัด" aria-controls="side" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <div class="header-actions">
         <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบแจ้งเตือน</button>
         <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
@@ -862,21 +961,56 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
       </section>
   </main>
 
-  <!-- แถบทางลัดด้านล่าง (เหมือน task bar) -->
-  <nav class="dock" id="tiles" aria-label="ทางลัดเว็บไซต์"></nav>
 </div>
+
+<!-- แถบด้านข้าง: ทางลัด (เปิดจากปุ่ม 3 ขีดมุมบนซ้าย) -->
+<div class="side-scrim" id="sideScrim"></div>
+<aside class="side glass" id="side" aria-label="แถบทางลัด" aria-hidden="true" inert>
+  <div class="side-head">
+    <div class="side-title">ทางลัด</div>
+    <button class="side-close" id="sideClose" type="button" aria-label="ปิดแถบทางลัด">&times;</button>
+  </div>
+  <nav class="side-list" id="tiles" aria-label="ทางลัดเว็บไซต์"></nav>
+  <div class="side-foot">
+    <div class="side-label">รูปแบบแถบ</div>
+    <div class="seg" id="sideStyleSeg" role="group" aria-label="รูปแบบแถบ">
+      <button type="button" data-style="glass">Liquid Glass</button>
+      <button type="button" data-style="normal">ปกติ</button>
+    </div>
+  </div>
+</aside>
 
 <dialog id="dlg">
   <form id="linkForm" method="dialog">
-    <h3>เพิ่มทางลัด</h3>
+    <h3 id="linkTitle">เพิ่มทางลัด</h3>
     <label for="url">ที่อยู่เว็บไซต์ (URL)</label>
     <input id="url" type="text" placeholder="youtube.com" autocomplete="off">
     <label for="name">ชื่อ (ไม่ใส่ก็ได้)</label>
     <input id="name" type="text" placeholder="ใช้ชื่อโดเมนถ้าเว้นว่าง" maxlength="30" autocomplete="off">
+    <div id="grpWrap" hidden>
+      <label for="grp">โฟลเดอร์</label>
+      <select id="grp"></select>
+    </div>
     <div class="err" id="err" role="alert"></div>
     <div class="actions">
       <button class="btn ghost" type="button" id="cancel">ยกเลิก</button>
-      <button class="btn" type="submit">เพิ่มทางลัด</button>
+      <button class="btn" type="submit" id="linkSubmit">เพิ่มทางลัด</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="grpDlg">
+  <form id="grpForm" method="dialog">
+    <h3 id="grpTitle">โฟลเดอร์ใหม่</h3>
+    <label for="grpName">ชื่อโฟลเดอร์</label>
+    <input id="grpName" type="text" placeholder="เช่น งาน, ส่วนตัว" maxlength="24" autocomplete="off">
+    <label id="grpColorLbl">สีหัวข้อ</label>
+    <div class="swatches" id="grpColors" role="radiogroup" aria-labelledby="grpColorLbl"></div>
+    <div class="err" id="grpErr" role="alert"></div>
+    <div class="actions">
+      <button class="btn ghost" type="button" id="grpDel" hidden>ลบโฟลเดอร์</button>
+      <button class="btn ghost" type="button" id="grpCancel">ยกเลิก</button>
+      <button class="btn" type="submit">บันทึก</button>
     </div>
   </form>
 </dialog>
@@ -1310,32 +1444,157 @@ function icon(l) {
   return box;
 }
 
+/* ---------- โฟลเดอร์/หมวดทางลัด ---------- */
+/* โครงสร้างข้อมูล: groups = [{id, name, color, collapsed}], links[i].g = id โฟลเดอร์ (ไม่มี = ทั่วไป) */
+const GROUP_COLORS = ['#EF4444', '#F59E0B', '#10B981', '#14B8A6', '#3B82F6', '#8B5CF6', '#EC4899', '#94A3B8'];
+let groups = load('linkGroups', []);
+let generalCollapsed = load('generalCollapsed', false);
+const saveGroups = () => save('linkGroups', groups);
+const newGid = () => 'g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+const FOLDER_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" fill-opacity=".22" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+const CHEV_SVG = '<svg class="chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+const PENCIL_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+const PLUS_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+
+/* ปุ่มเล็กในแถวหัวข้อโฟลเดอร์ */
+function foldBtn(svg, label, fn) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'fold-btn'; b.innerHTML = svg;
+  b.setAttribute('aria-label', label); b.title = label;
+  b.onclick = fn;
+  return b;
+}
+
+/* สร้างทางลัด 1 รายการ (i = ตำแหน่งใน links) */
+function makeTile(l, i) {
+  const a = document.createElement('a');
+  a.className = 'tile';
+  a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
+  a.title = l.url;
+  a.draggable = true; /* ลากไปวางในโฟลเดอร์อื่นได้ (เดสก์ท็อป) */
+  a.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', String(i));
+    e.dataTransfer.effectAllowed = 'move';
+    a.classList.add('dragging');
+  });
+  a.addEventListener('dragend', () => a.classList.remove('dragging'));
+  const n = document.createElement('span');
+  n.className = 'n'; n.textContent = l.name;
+  const edit = document.createElement('button');
+  edit.className = 'edit'; edit.type = 'button'; edit.innerHTML = PENCIL_SVG;
+  edit.setAttribute('aria-label', 'แก้ไขทางลัด ' + l.name);
+  edit.onclick = e => { e.preventDefault(); e.stopPropagation(); openDialog(i); };
+  const del = document.createElement('button');
+  del.className = 'del'; del.type = 'button'; del.textContent = '×';
+  del.setAttribute('aria-label', 'ลบทางลัด ' + l.name);
+  del.onclick = e => { e.preventDefault(); e.stopPropagation(); links.splice(i, 1); save('links', links); renderLinks(); };
+  a.append(icon(l), n, edit, del);
+  return a;
+}
+
+/* สร้าง 1 โฟลเดอร์ (g.id = null คือ "ทั่วไป") */
+function makeSection(g, items) {
+  const sec = document.createElement('section');
+  sec.className = 'fold' + (g.collapsed ? ' collapsed' : '') + (g.color ? '' : ' plain');
+  if (g.color) sec.style.setProperty('--fc', g.color);
+
+  const head = document.createElement('div');
+  head.className = 'fold-head';
+  const tg = document.createElement('button');
+  tg.type = 'button'; tg.className = 'fold-toggle';
+  tg.setAttribute('aria-expanded', String(!g.collapsed));
+  tg.insertAdjacentHTML('beforeend', CHEV_SVG + FOLDER_SVG);
+  const nm = document.createElement('span'); nm.className = 'fn'; nm.textContent = g.name;
+  const ct = document.createElement('span'); ct.className = 'fcnt'; ct.textContent = items.length;
+  tg.append(nm, ct);
+  tg.onclick = () => {
+    if (g.id) { g.collapsed = !g.collapsed; saveGroups(); }
+    else { generalCollapsed = !generalCollapsed; save('generalCollapsed', generalCollapsed); }
+    renderLinks();
+  };
+  head.appendChild(tg);
+  if (g.id) {
+    head.appendChild(foldBtn(PLUS_SVG, 'เพิ่มทางลัดในโฟลเดอร์ ' + g.name, () => openDialog(null, g.id)));
+    head.appendChild(foldBtn(PENCIL_SVG, 'แก้ไขโฟลเดอร์ ' + g.name, () => openGroupDialog(g.id)));
+  }
+
+  const body = document.createElement('div');
+  body.className = 'fold-body';
+  items.forEach(({ l, i }) => body.appendChild(makeTile(l, i)));
+  if (!items.length) {
+    const em = document.createElement('div');
+    em.className = 'fold-empty'; em.textContent = 'ลากทางลัดมาวางที่นี่';
+    body.appendChild(em);
+  }
+  sec.append(head, body);
+
+  /* วางทางลัดลงโฟลเดอร์นี้ */
+  sec.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; sec.classList.add('over'); });
+  sec.addEventListener('dragleave', e => { if (!sec.contains(e.relatedTarget)) sec.classList.remove('over'); });
+  sec.addEventListener('drop', e => {
+    e.preventDefault(); sec.classList.remove('over');
+    const i = parseInt(e.dataTransfer.getData('text/plain'), 10);
+    if (!links[i]) return;
+    if (g.id) links[i].g = g.id; else delete links[i].g;
+    save('links', links); renderLinks();
+  });
+  return sec;
+}
+
 function renderLinks() {
   const wrap = $('#tiles');
   wrap.textContent = '';
-  links.forEach((l, i) => {
-    const a = document.createElement('a');
-    a.className = 'tile';
-    a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
-    a.title = l.url;
-    const n = document.createElement('span');
-    n.className = 'n'; n.textContent = l.name;
-    const del = document.createElement('button');
-    del.className = 'del'; del.type = 'button'; del.textContent = '×';
-    del.setAttribute('aria-label', 'ลบทางลัด ' + l.name);
-    del.onclick = e => { e.preventDefault(); e.stopPropagation(); links.splice(i, 1); save('links', links); renderLinks(); };
-    a.append(icon(l), n, del);
-    wrap.appendChild(a);
-  });
+  const ids = new Set(groups.map(g => g.id));
+  /* ทางลัดที่อ้างโฟลเดอร์ที่ไม่มีอยู่แล้ว จะถูกนับเป็น "ทั่วไป" */
+  const inGroup = gid => links.map((l, i) => ({ l, i })).filter(({ l }) => (ids.has(l.g) ? l.g : null) === gid);
+  if (!groups.length) {
+    inGroup(null).forEach(({ l, i }) => wrap.appendChild(makeTile(l, i)));
+  } else {
+    wrap.appendChild(makeSection({ id: null, name: 'ทั่วไป', color: null, collapsed: generalCollapsed }, inGroup(null)));
+    groups.forEach(g => wrap.appendChild(makeSection(g, inGroup(g.id))));
+  }
+  const row = document.createElement('div');
+  row.className = 'side-actions';
   const add = document.createElement('button');
   add.className = 'tile add-tile'; add.type = 'button';
   add.innerHTML = '<b>+</b>เพิ่มทางลัด';
-  add.onclick = openDialog;
-  wrap.appendChild(add);
+  add.onclick = () => openDialog();
+  const addG = document.createElement('button');
+  addG.className = 'tile add-tile'; addG.type = 'button';
+  addG.innerHTML = FOLDER_SVG + 'โฟลเดอร์ใหม่';
+  addG.onclick = () => openGroupDialog();
+  row.append(add, addG);
+  wrap.appendChild(row);
 }
 
+/* ---------- ไดอะล็อกเพิ่ม/แก้ไขทางลัด ---------- */
 const dlg = $('#dlg');
-function openDialog() { $('#url').value = ''; $('#name').value = ''; $('#err').textContent = ''; dlg.showModal(); $('#url').focus(); }
+let editIdx = null; /* null = เพิ่มใหม่, ตัวเลข = แก้ไขทางลัดที่ตำแหน่งนั้น */
+function fillGroupSelect(selected) {
+  const sel = $('#grp');
+  sel.textContent = '';
+  const o0 = document.createElement('option');
+  o0.value = ''; o0.textContent = 'ทั่วไป (ไม่อยู่โฟลเดอร์)';
+  sel.appendChild(o0);
+  groups.forEach(g => {
+    const o = document.createElement('option');
+    o.value = g.id; o.textContent = g.name;
+    sel.appendChild(o);
+  });
+  sel.value = groups.some(g => g.id === selected) ? selected : '';
+  $('#grpWrap').hidden = !groups.length;
+}
+function openDialog(idx = null, gid = null) {
+  editIdx = idx;
+  const l = idx !== null ? links[idx] : null;
+  $('#linkTitle').textContent = l ? 'แก้ไขทางลัด' : 'เพิ่มทางลัด';
+  $('#linkSubmit').textContent = l ? 'บันทึก' : 'เพิ่มทางลัด';
+  $('#url').value = l ? l.url : '';
+  $('#name').value = l ? l.name : '';
+  fillGroupSelect(l ? l.g : gid);
+  $('#err').textContent = '';
+  dlg.showModal(); $('#url').focus();
+}
 $('#cancel').onclick = () => dlg.close();
 $('#linkForm').addEventListener('submit', e => {
   e.preventDefault();
@@ -1346,9 +1605,98 @@ $('#linkForm').addEventListener('submit', e => {
   try { u = new URL(raw); if (!u.hostname.includes('.')) throw 0; }
   catch { $('#err').textContent = 'ที่อยู่เว็บไซต์ไม่ถูกต้อง เช่น youtube.com'; return; }
   const name = $('#name').value.trim() || u.hostname.replace(/^www\./, '');
-  links.push({ name, url: u.href });
+  const rec = { name, url: u.href };
+  const gid = $('#grp').value;
+  if (gid) rec.g = gid;
+  if (editIdx !== null && links[editIdx]) links[editIdx] = rec; else links.push(rec);
   save('links', links); renderLinks(); dlg.close();
 });
+
+/* ---------- ไดอะล็อกเพิ่ม/แก้ไขโฟลเดอร์ ---------- */
+const grpDlg = $('#grpDlg');
+let grpEditId = null, grpColor = GROUP_COLORS[0], grpDelArmed = false;
+function setGrpColor(c) {
+  grpColor = c;
+  $$('#grpColors button').forEach(b => {
+    const on = b.dataset.c === c;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-checked', String(on));
+  });
+}
+GROUP_COLORS.forEach(c => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.dataset.c = c; b.style.setProperty('--sw', c);
+  b.setAttribute('role', 'radio'); b.setAttribute('aria-label', 'สี ' + c);
+  b.onclick = () => setGrpColor(c);
+  $('#grpColors').appendChild(b);
+});
+function openGroupDialog(id = null) {
+  grpEditId = id;
+  const g = id ? groups.find(x => x.id === id) : null;
+  $('#grpTitle').textContent = g ? 'แก้ไขโฟลเดอร์' : 'โฟลเดอร์ใหม่';
+  $('#grpName').value = g ? g.name : '';
+  setGrpColor(g ? g.color : GROUP_COLORS[groups.length % GROUP_COLORS.length]);
+  grpDelArmed = false;
+  $('#grpDel').textContent = 'ลบโฟลเดอร์';
+  $('#grpDel').hidden = !g;
+  $('#grpErr').textContent = '';
+  grpDlg.showModal(); $('#grpName').focus();
+}
+$('#grpCancel').onclick = () => grpDlg.close();
+$('#grpDel').onclick = () => {
+  if (!grpDelArmed) { /* กดครั้งแรก: ขอให้ยืนยันก่อนลบ */
+    grpDelArmed = true;
+    $('#grpDel').textContent = 'กดอีกครั้งเพื่อยืนยัน';
+    $('#grpErr').textContent = 'ทางลัดในโฟลเดอร์นี้จะไม่ถูกลบ แต่จะย้ายไป "ทั่วไป"';
+    return;
+  }
+  groups = groups.filter(g => g.id !== grpEditId);
+  links.forEach(l => { if (l.g === grpEditId) delete l.g; });
+  saveGroups(); save('links', links); renderLinks(); grpDlg.close();
+};
+$('#grpForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#grpName').value.trim();
+  if (!name) { $('#grpErr').textContent = 'กรุณาตั้งชื่อโฟลเดอร์'; return; }
+  const g = grpEditId ? groups.find(x => x.id === grpEditId) : null;
+  if (g) { g.name = name; g.color = grpColor; }
+  else groups.push({ id: newGid(), name, color: grpColor, collapsed: false });
+  saveGroups(); renderLinks(); grpDlg.close();
+});
+
+/* ---------- แถบด้านข้าง (ปุ่ม 3 ขีด) ---------- */
+const sideEl = $('#side'), scrimEl = $('#sideScrim'), menuBtn = $('#menuBtn');
+function setSide(open) {
+  if (!open && sideEl.contains(document.activeElement)) menuBtn.focus(); /* คืนโฟกัสก่อนซ่อนแถบ */
+  sideEl.inert = !open;
+  sideEl.setAttribute('aria-hidden', String(!open));
+  sideEl.classList.toggle('open', open);
+  scrimEl.classList.toggle('show', open);
+  menuBtn.setAttribute('aria-expanded', String(open));
+  if (open) $('#sideClose').focus();
+}
+function applySideStyle(v) {
+  const style = v === 'normal' ? 'normal' : 'glass';
+  sideEl.classList.toggle('glass', style === 'glass');
+  $$('#sideStyleSeg button').forEach(b => {
+    const on = b.dataset.style === style;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+  save('sideStyle', style);
+}
+menuBtn.onclick = () => setSide(!sideEl.classList.contains('open'));
+$('#sideClose').onclick = () => setSide(false);
+scrimEl.onclick = () => setSide(false);
+$$('#sideStyleSeg button').forEach(b => { b.onclick = () => applySideStyle(b.dataset.style); });
+/* กดลิงก์ทางลัดแล้วปิดแถบ (ไม่นับปุ่มลบ/ปุ่มเพิ่ม) */
+$('#tiles').addEventListener('click', e => {
+  if (e.target.closest('a.tile') && !e.target.closest('.del')) setSide(false);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && sideEl.classList.contains('open') && !dlg.open && !grpDlg.open) setSide(false);
+});
+applySideStyle(load('sideStyle', 'glass'));
 
 /* ---------- ระบบ Todo & ปฏิทิน ---------- */
 function toggleRepeatEnd() {
