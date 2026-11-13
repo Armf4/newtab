@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-ui="glass">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -504,6 +504,43 @@ dialog select:focus{outline:0;border-color:var(--accent)}
 .swatches button.on{border-color:var(--ink)}
 #grpDel{margin-right:auto;color:var(--danger)}
 
+/* ซ่อน/แสดงแถบ (ปฏิทิน / ภารกิจ / แดชบอร์ด) และแถบเครื่องมือ */
+.is-hidden{display:none !important}
+.panel-toggles{position:absolute;top:50px;right:0;display:flex;gap:6px;z-index:4}
+.pt-btn{
+  display:flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:5px 11px;
+  background:var(--panel);color:var(--ink);font-size:12px;font-weight:500;
+  box-shadow:3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);transition:all .2s;
+}
+.pt-btn b{font-size:16px;font-weight:600;line-height:1;color:var(--accent)}
+.pt-btn.off{color:var(--mute);box-shadow:inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light)}
+.tools-toggle{
+  align-self:center;width:34px;height:34px;padding:0;border:none;border-radius:12px;
+  display:grid;place-items:center;background:var(--panel);color:var(--ink);
+  box-shadow:4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);transition:all .2s;
+}
+.tools-toggle:active{box-shadow:inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light)}
+.wrap.tools-collapsed .header-actions > :not(.tools-toggle){display:none !important}
+.wrap.tools-collapsed .panel-toggles{display:none}
+.wrap.centered main{display:none}
+.wrap.compact .col-resizer,.wrap.centered .col-resizer{display:none}
+@media (min-width:901px){
+  .wrap.compact main{justify-content:center;gap:24px}
+  .wrap.compact main > section:not(.is-hidden){flex:1 1 0 !important;width:auto !important;max-width:900px}
+  .wrap.centered{padding-bottom:0}
+  .wrap.centered .topbar{flex:1;display:flex;flex-direction:column;justify-content:center;background:transparent;padding-top:0}
+  .wrap.centered header{margin-bottom:18px}
+  .wrap.centered form.search{max-width:640px;margin-bottom:0}
+  .wrap.centered .menu-btn{position:fixed;top:16px;left:28px;z-index:6}
+  .wrap.centered .header-actions{position:fixed;top:16px;right:28px;z-index:6}
+  .wrap.centered .panel-toggles{position:fixed;top:66px;right:28px;z-index:6}
+}
+@media (max-width:900px){
+  .panel-toggles{position:static;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+  .wrap.centered{display:flex;flex-direction:column;height:100dvh;min-height:100vh}
+  .wrap.centered .topbar{flex:1;display:flex;flex-direction:column;justify-content:center;background:transparent}
+}
+
 /* แถบเลื่อนสีเข้มให้เข้ากับธีม */
 :root[data-theme=dark]{color-scheme:dark}
 *{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
@@ -815,6 +852,137 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
 .agenda-sub{font-size:11px;color:var(--mute);margin-top:1px}
 .agenda-item.done .agenda-title{text-decoration:line-through;color:var(--mute)}
 .agenda-item.done .agenda-bar{background:var(--success);opacity:.6}
+
+/* =====================================================================
+   ธีม Liquid Glass (ธีมหลัก)
+   - ลบ data-ui="glass" ออกจากแท็ก <html> เพื่อกลับไปใช้ Neumorphism เดิม
+   - ปรับความใส/ความเบลอได้ที่ --lg-a (ยิ่งน้อยยิ่งใส) และ --lg-blur
+   ===================================================================== */
+:root[data-ui=glass]{
+  --lg-a:.26; --lg-blur:22px;
+  --lg-bd:rgba(255,255,255,.75); --lg-hi:rgba(255,255,255,.95); --lg-sh:rgba(60,70,120,.2);
+  --lg-chip:rgba(255,255,255,.45); --lg-chip2:rgba(255,255,255,.68);
+  --lg-field:rgba(255,255,255,.5); --lg-pop:rgba(246,249,255,.74); --lg-solid:rgba(240,244,252,.94);
+  --lg-blob1:color-mix(in srgb,var(--accent) 38%,transparent);
+  --lg-blob2:rgba(139,92,246,.28); --lg-blob3:rgba(20,184,166,.28);
+  --bg:#dbe3f2; --panel:rgba(255,255,255,.45); --ink:#16181f; --mute:rgba(22,24,31,.62); --line:rgba(22,24,31,.12);
+  --glass-bg:rgba(255,255,255,.26); --shadow-dark:rgba(60,70,120,.18); --shadow-light:rgba(255,255,255,.6);
+}
+:root[data-ui=glass][data-theme=dark]{
+  --lg-a:.09;
+  --lg-bd:rgba(255,255,255,.2); --lg-hi:rgba(255,255,255,.42); --lg-sh:rgba(0,0,0,.45);
+  --lg-chip:rgba(255,255,255,.08); --lg-chip2:rgba(255,255,255,.15);
+  --lg-field:rgba(255,255,255,.06); --lg-pop:rgba(24,26,38,.62); --lg-solid:rgba(22,24,34,.94);
+  --lg-blob1:color-mix(in srgb,var(--accent) 55%,transparent);
+  --lg-blob2:rgba(139,92,246,.42); --lg-blob3:rgba(20,184,166,.36);
+  --bg:#0a0c13; --panel:rgba(255,255,255,.07); --ink:#eef2f8; --mute:rgba(255,255,255,.62); --line:rgba(255,255,255,.14);
+  --glass-bg:rgba(255,255,255,.09); --shadow-dark:rgba(0,0,0,.3); --shadow-light:rgba(255,255,255,.05);
+}
+/* เบราว์เซอร์ที่ไม่รองรับ backdrop-filter: ใช้พื้นทึบขึ้นแทน เพื่อให้ยังอ่านออก */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  :root[data-ui=glass]{--lg-a:.86;--lg-chip:rgba(255,255,255,.7);--lg-pop:rgba(246,249,255,.97)}
+  :root[data-ui=glass][data-theme=dark]{--lg-a:.12;--lg-chip:rgba(255,255,255,.1);--lg-pop:rgba(24,26,38,.97)}
+}
+
+/* พื้นหลัง: แสงออโรร่านุ่มๆ ให้กระจกมีสีหักเห (ตามสีหลักที่เลือก) */
+:root[data-ui=glass] body{
+  background:
+    radial-gradient(circle 60vmax at 6% -4%, var(--lg-blob1), transparent 62%),
+    radial-gradient(circle 55vmax at 98% 24%, var(--lg-blob2), transparent 62%),
+    radial-gradient(circle 62vmax at 46% 112%, var(--lg-blob3), transparent 62%),
+    var(--bg);
+  background-attachment:fixed;
+}
+:root[data-ui=glass] .topbar{background:transparent}
+@media (max-width:900px){
+  :root[data-ui=glass] .topbar{background:var(--lg-pop);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+}
+
+/* แถบหลัก 3 แถบ (ปฏิทิน / ภารกิจ / แดชบอร์ด) */
+:root[data-ui=glass] main > section{
+  background-color:rgba(255,255,255,var(--lg-a));
+  background-image:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,0) 42%);
+  -webkit-backdrop-filter:blur(var(--lg-blur)) saturate(180%);backdrop-filter:blur(var(--lg-blur)) saturate(180%);
+  border:1px solid var(--lg-bd);border-radius:26px;
+  box-shadow:inset 0 1px 0 var(--lg-hi),inset 0 -1px 0 rgba(255,255,255,.08),0 16px 40px var(--lg-sh);
+}
+
+/* ปุ่ม/ชิป แบบกระจกใส */
+:root[data-ui=glass] :where(.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.calendar-header button,.btn.ghost,.filters button:not([aria-pressed=true]),.time-chip:not(.selected):not(.custom-toggle),.del-modal-actions button:not(.cancel-btn),.search kbd){
+  background:var(--lg-chip);
+  border:1px solid var(--lg-bd);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);
+  box-shadow:inset 0 1px 0 var(--lg-hi),0 6px 16px var(--lg-sh);
+}
+:root[data-ui=glass] :where(.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.calendar-header button,.btn.ghost,.filters button:not([aria-pressed=true]),.time-chip:not(.selected):not(.custom-toggle),.del-modal-actions button:not(.cancel-btn)):hover{background:var(--lg-chip2)}
+:root[data-ui=glass] :where(.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.calendar-header button,.btn.ghost,.filters button:not([aria-pressed=true]),.time-chip:not(.selected):not(.custom-toggle),.del-modal-actions button:not(.cancel-btn)):active{
+  transform:scale(.97);box-shadow:inset 0 2px 5px rgba(0,0,0,.25);
+}
+:root[data-ui=glass] .theme-btn,:root[data-ui=glass] .sys-btn{border-radius:999px}
+:root[data-ui=glass] .pt-btn.off{background:transparent;box-shadow:none;color:var(--mute)}
+:root[data-ui=glass] .btn:not(.ghost),
+:root[data-ui=glass] .time-chip.selected,
+:root[data-ui=glass] .filters button[aria-pressed=true]{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 20px color-mix(in srgb,var(--accent) 35%,transparent);
+}
+
+/* ช่องกรอก */
+:root[data-ui=glass] :is(.todo input[type=text],.todo input[type=date],.todo input[type=time],.todo select,dialog input,dialog select):not(:focus){
+  background:var(--lg-field);
+  border:1px solid var(--lg-bd);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.18);
+}
+
+/* แถบค้นหา */
+:root[data-ui=glass] form.search{
+  background:var(--lg-chip);border:1px solid var(--lg-bd);border-radius:999px;
+  -webkit-backdrop-filter:blur(var(--lg-blur)) saturate(180%);backdrop-filter:blur(var(--lg-blur)) saturate(180%);
+  box-shadow:inset 0 1px 0 var(--lg-hi),0 10px 28px var(--lg-sh);
+}
+:root[data-ui=glass] form.search:focus-within{
+  border-color:var(--accent);
+  box-shadow:inset 0 1px 0 var(--lg-hi),0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent),0 10px 28px var(--lg-sh);
+}
+:root[data-ui=glass] .search button{
+  margin:4px;padding:0 26px;border-radius:999px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 6px 16px color-mix(in srgb,var(--accent) 40%,transparent);
+}
+
+/* ปฏิทิน / รายการงาน / แดชบอร์ด */
+:root[data-ui=glass] .calendar-day:not(.empty){
+  background:var(--lg-chip);border:1px solid var(--lg-bd);
+  box-shadow:inset 0 1px 0 var(--lg-hi);
+}
+:root[data-ui=glass] .calendar-day:not(.empty):hover{background:var(--lg-chip2)}
+:root[data-ui=glass] .calendar-day.today{border:1.5px solid var(--accent)}
+:root[data-ui=glass] li input[type=checkbox]{
+  background:var(--lg-chip);border:1px solid var(--lg-bd);
+  box-shadow:inset 0 1px 0 var(--lg-hi),0 4px 10px var(--lg-sh);
+}
+:root[data-ui=glass] li input[type=checkbox]:active{box-shadow:inset 0 2px 5px rgba(0,0,0,.3)}
+:root[data-ui=glass] .system-status{
+  background:var(--lg-chip);border:1px solid var(--lg-bd);border-radius:14px;
+  box-shadow:inset 0 1px 0 var(--lg-hi);
+}
+:root[data-ui=glass] .stat-card{
+  background:var(--lg-chip);border:1px solid var(--lg-bd);border-radius:18px;
+  box-shadow:inset 0 1px 0 var(--lg-hi),0 8px 22px var(--lg-sh);
+}
+:root[data-ui=glass] .stat-bar-bg{background:rgba(127,127,127,.2);box-shadow:inset 0 1px 2px rgba(0,0,0,.25)}
+
+/* หน้าต่างป๊อปอัป / ไดอะล็อก / เมนูย่อย */
+:root[data-ui=glass] :where(dialog,.del-modal,.bg-pop,.color-pop){
+  background:var(--lg-pop);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
+  border:1px solid var(--lg-bd);
+  box-shadow:inset 0 1px 0 var(--lg-hi),0 24px 70px rgba(0,0,0,.4);
+}
+:root[data-ui=glass] dialog,:root[data-ui=glass] .del-modal{border-radius:26px}
+:root[data-ui=glass] dialog::backdrop{background:rgba(5,6,12,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+:root[data-ui=glass] .del-modal-overlay{background:rgba(5,6,12,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+
+/* แถบด้านข้างโหมด "ปกติ" ในธีมกระจก ให้ทึบขึ้นเล็กน้อย */
+:root[data-ui=glass] .side:not(.glass){background:var(--lg-solid);border:1px solid var(--lg-bd);box-shadow:0 20px 50px rgba(0,0,0,.3)}
 </style>
 </head>
 <body>
@@ -824,12 +992,18 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
     <header>
       <button class="menu-btn" id="menuBtn" type="button" title="ทางลัด" aria-label="เปิดแถบทางลัด" aria-controls="side" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <div class="header-actions">
-        <button class="sys-btn" id="pushTestBtn" type="button">🔔 ทดสอบแจ้งเตือน</button>
+        <button class="sys-btn" id="pushTestBtn" type="button">🔔 </button>
         <button class="theme-btn" id="theme" type="button">โหมดมืด</button>
         <button class="color-btn" id="colorBtn" type="button" title="เปลี่ยนสี" aria-label="เปลี่ยนสีหลัก"><i></i></button>
         <div class="color-pop" id="colorPop" hidden></div>
         <button class="color-btn" id="bgBtn" type="button" title="เปลี่ยนอนิเมชั่นพื้นหลัง" aria-label="เลือกอนิเมชั่นพื้นหลัง"><span id="bgIcon" style="display:grid;place-items:center;width:18px;height:18px;color:var(--accent)"></span></button>
         <div class="bg-pop" id="bgPop" hidden></div>
+        <button class="tools-toggle" id="toolsToggle" type="button" aria-expanded="true" aria-label="ซ่อนแถบเครื่องมือ" title="ซ่อนแถบเครื่องมือ"></button>
+      </div>
+      <div class="panel-toggles" id="panelToggles" role="group" aria-label="ซ่อนหรือแสดงแถบ">
+        <button class="pt-btn" type="button" data-panel="cal"><b>&minus;</b>ปฏิทิน</button>
+        <button class="pt-btn" type="button" data-panel="todo"><b>&minus;</b>ภารกิจ</button>
+        <button class="pt-btn" type="button" data-panel="dash"><b>&minus;</b>แดชบอร์ด</button>
       </div>
       <div class="clock-container">
         <div class="clock" id="clock">00:00</div>
@@ -1102,21 +1276,31 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('#colorP
 
 /* ---------- อนิเมชั่นพื้นหลัง ---------- */
 const BG_MODES = [
-  { id: 'aurora',  label: 'แสงออโรรา' },
-  { id: 'stars',   label: 'ดวงดาว (โหมดสว่างเป็นเมฆ)' },
-  { id: 'network', label: 'อนุภาคเชื่อมเส้น' },
-  { id: 'rain',    label: 'ฝน' },
-  { id: 'snow',    label: 'หิมะ' },
-  { id: 'none',    label: 'ไม่มีอนิเมชั่น' }
+  { id: 'lava',      label: 'ก้อนสีลอย (Lava blobs)' },
+  { id: 'fireflies', label: 'หิ่งห้อย' },
+  { id: 'ripples',   label: 'ระลอกน้ำ' },
+  { id: 'bokeh',     label: 'Bokeh' },
+  { id: 'embers',    label: 'ประกายไฟ' },
+  { id: 'meteors',   label: 'ดาวตก' },
+  { id: 'neon',      label: 'ฝนนีออน' },
+  { id: 'sakura',    label: 'กลีบซากุระ' },
+  { id: 'bubbles',   label: 'ฟองสบู่' },
+  { id: 'clouds',    label: 'เมฆลอย' },
+  { id: 'none',      label: 'ไม่มีอนิเมชั่น' }
 ];
 /* ไอคอนของแต่ละโหมด (แสดงบนปุ่ม) */
 const BG_ICONS = {
-  aurora:  '<path d="M3 8.5c3-3 6 3 9 0s6 3 9 0M3 14c3-3 6 3 9 0s6 3 9 0M3 19.5c3-3 6 3 9 0s6 3 9 0"/>',
-  stars:   '<path fill="currentColor" d="M12 2.5l2.4 7.1 7.1 2.4-7.1 2.4L12 21.5l-2.4-7.1L2.5 12l7.1-2.4z"/>',
-  network: '<path d="M6 7l6 10 7-9M6 7l13 1"/><circle cx="6" cy="7" r="2.3" fill="currentColor"/><circle cx="12" cy="17" r="2.3" fill="currentColor"/><circle cx="19" cy="8" r="2.3" fill="currentColor"/>',
-  rain:    '<path d="M7 14.5a4 4 0 010-8 5 5 0 019.6 1.4A3.3 3.3 0 0117 14.5z"/><path d="M8 17.5l-1 3M12.5 17.5l-1 3M17 17.5l-1 3"/>',
-  snow:    '<path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6M9.5 4l2.5 2.5L14.5 4M9.5 20l2.5-2.5 2.5 2.5"/>',
-  none:    '<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>'
+  lava:      '<circle cx="9" cy="10" r="5"/><circle cx="16" cy="15" r="4"/><circle cx="17" cy="7" r="2"/>',
+  fireflies: '<circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M17.7 6.3l-1.4 1.4M7.7 16.3l-1.4 1.4"/>',
+  ripples:   '<circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="10"/>',
+  bokeh:     '<circle cx="8" cy="9" r="4.5"/><circle cx="16.5" cy="14.5" r="3.5"/><circle cx="17" cy="6.5" r="1.8" fill="currentColor"/>',
+  embers:    '<path d="M12 3c1 3 5 5 5 10a5 5 0 01-10 0c0-2 1-3 2-4 .3 1.5 1 2 2 2 0-3-1-5 1-8z"/>',
+  meteors:   '<path d="M19 5L6 18M19 5h-6M19 5v6"/><path d="M4 12l3-3M12 20l3-3"/>',
+  neon:      '<path d="M7 4v6M12 9v8M17 5v7M7 15v4M17 16v4"/>',
+  sakura:    '<path d="M12 12c-4-2-4-7 0-9 4 2 4 7 0 9zM12 12c4-2 9 0 9 5-4 3-8 1-9-5zM12 12c-4-2-9 0-9 5 4 3 8 1 9-5z"/>',
+  bubbles:   '<circle cx="9" cy="14" r="5"/><circle cx="17" cy="7" r="3"/><path d="M7 12a3 3 0 012-2"/>',
+  clouds:    '<path d="M7 18a4 4 0 010-8 5 5 0 019.6 1.4A3.3 3.3 0 0117 18z"/>',
+  none:      '<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>'
 };
 function updateBgIcon() {
   $('#bgBtn').title = 'อนิเมชั่นพื้นหลัง: ' + BG_MODES.find(m => m.id === bgMode).label;
@@ -1157,128 +1341,192 @@ function refreshBgColors() {
 
 function initMode() {
   const S = {};
-  const area = bgW * bgH;
-  if (bgMode === 'aurora') {
-    S.blobs = [
-      { x: .2, y: .3, r: .45, sp: .00007, ph: 0, hOff: 0 },
-      { x: .75, y: .25, r: .4, sp: .00009, ph: 2, hOff: 45 },
-      { x: .5, y: .8, r: .5, sp: .00006, ph: 4, hOff: -45 }
-    ];
-  } else if (bgMode === 'stars') {
-    S.stars = Array.from({ length: Math.round(area / 7000) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), r: rnd(.4, 1.4), ph: rnd(0, 6.28), sp: rnd(.0006, .002) }));
-    S.sh = null; S.next = performance.now() + 2500;
-    S.clouds = Array.from({ length: 7 }, () => {
-      const sz = rnd(60, 130);
-      return { x: rnd(-200, bgW), y: rnd(0, bgH * .85), v: rnd(6, 16), sz,
-        puffs: Array.from({ length: 5 }, (_, i) => ({ dx: (i - 2) * sz * .55 + rnd(-10, 10), dy: rnd(-sz * .18, sz * .18), r: sz * rnd(.55, .85) })) };
-    });
-  } else if (bgMode === 'network') {
-    S.pts = Array.from({ length: Math.min(90, Math.round(area / 16000)) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), vx: rnd(-22, 22), vy: rnd(-22, 22), r: rnd(1, 2.2) }));
-  } else if (bgMode === 'rain') {
-    S.drops = Array.from({ length: Math.min(260, Math.round(bgW / 6)) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), l: rnd(10, 24), v: rnd(600, 950) }));
-  } else if (bgMode === 'snow') {
-    S.flakes = Array.from({ length: Math.min(200, Math.round(bgW / 9)) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), r: rnd(1, 3.2), v: rnd(22, 60), ph: rnd(0, 6.28), sw: rnd(.4, 1.2) }));
+  const area = bgW * bgH, mx = Math.max(bgW, bgH);
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  if (bgMode === 'lava') {
+    S.blobs = [0, 55, -60, 140, -130, 200].map(h => ({ x: rnd(0, bgW), y: rnd(0, bgH), r: rnd(.2, .34) * mx, vx: rnd(-22, 22), vy: rnd(-18, 18), hOff: h }));
+  } else if (bgMode === 'fireflies') {
+    S.items = Array.from({ length: clamp(Math.round(area / 22000), 18, 70) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), a: rnd(0, 6.283), s: rnd(14, 38), p: rnd(0, 6.283) }));
+  } else if (bgMode === 'ripples') {
+    S.rings = []; S.next = 0;
+  } else if (bgMode === 'bokeh') {
+    S.items = Array.from({ length: clamp(Math.round(area / 45000), 10, 30) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), r: rnd(18, 62), v: rnd(6, 20), a: rnd(.08, .2), hOff: [0, 60, -60, 150, -150][Math.floor(rnd(0, 5))] }));
+  } else if (bgMode === 'embers') {
+    S.items = Array.from({ length: clamp(Math.round(area / 9000), 50, 160) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), v: rnd(25, 70), l: rnd(0, 1), w: rnd(0, 6.283) }));
+  } else if (bgMode === 'meteors') {
+    S.items = [];
+  } else if (bgMode === 'neon') {
+    S.items = Array.from({ length: clamp(Math.round(bgW / 10), 40, 140) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), v: rnd(480, 900), l: rnd(40, 110), c: Math.random() < .5 ? 0 : 1 }));
+  } else if (bgMode === 'sakura') {
+    S.items = Array.from({ length: clamp(Math.round(bgW / 45), 14, 40) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), v: rnd(24, 60), w: rnd(0, 6.283), s: rnd(7, 13), r: rnd(0, 6.283) }));
+  } else if (bgMode === 'bubbles') {
+    S.items = Array.from({ length: clamp(Math.round(bgW / 60), 10, 28) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), r: rnd(12, 38), v: rnd(20, 50), w: rnd(0, 6.283) }));
+  } else if (bgMode === 'clouds') {
+    S.items = Array.from({ length: 6 }, (_, i) => ({ x: rnd(-200, bgW), y: bgH * (.08 + i * .16) + rnd(-20, 20), r: rnd(55, 100), v: rnd(8, 22), tone: i % 2 }));
   }
   bgState = S;
 }
 
+/* t = เวลา (ms), dt = เวลาต่อเฟรม (วินาที) */
 const bgDraw = {
-  aurora(t) {
+  /* ก้อนสีลอยนุ่มๆ ชนขอบแล้วเด้ง (สีตามสีหลัก) */
+  lava(t, dt) {
     bctx.clearRect(0, 0, bgW, bgH);
     bctx.globalCompositeOperation = bgDark ? 'lighter' : 'source-over';
     bgState.blobs.forEach(b => {
-      const x = (b.x + Math.sin(t * b.sp + b.ph) * .18) * bgW;
-      const y = (b.y + Math.cos(t * b.sp * 1.3 + b.ph) * .15) * bgH;
-      const r = b.r * Math.max(bgW, bgH);
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      if (b.x < 0) { b.x = 0; b.vx = Math.abs(b.vx); } else if (b.x > bgW) { b.x = bgW; b.vx = -Math.abs(b.vx); }
+      if (b.y < 0) { b.y = 0; b.vy = Math.abs(b.vy); } else if (b.y > bgH) { b.y = bgH; b.vy = -Math.abs(b.vy); }
       const hue = (bgAccent.h + b.hOff + 360) % 360;
-      const g = bctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, `hsla(${hue},${Math.max(60, bgAccent.s)}%,${bgDark ? 55 : 68}%,${bgDark ? .24 : .3})`);
+      const g = bctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+      g.addColorStop(0, `hsla(${hue},${Math.max(60, bgAccent.s)}%,${bgDark ? 55 : 68}%,${bgDark ? .3 : .34})`);
       g.addColorStop(1, `hsla(${hue},80%,60%,0)`);
       bctx.fillStyle = g;
-      bctx.fillRect(0, 0, bgW, bgH);
+      bctx.fillRect(b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
     });
     bctx.globalCompositeOperation = 'source-over';
   },
-  stars(t, dt) {
+  /* หิ่งห้อย: จุดแสงเดินเตร่และกะพริบ */
+  fireflies(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.globalCompositeOperation = bgDark ? 'lighter' : 'source-over';
+    bgState.items.forEach(o => {
+      o.a += (Math.random() - .5) * 6 * dt;
+      o.x = (o.x + Math.cos(o.a) * o.s * dt + bgW) % bgW;
+      o.y = (o.y + Math.sin(o.a) * o.s * dt + bgH) % bgH;
+      const al = .3 + .7 * Math.abs(Math.sin(t / 700 + o.p));
+      const g = bctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, 14);
+      g.addColorStop(0, bgDark ? `hsla(48,100%,72%,${al})` : `hsla(38,95%,52%,${al * .9})`);
+      g.addColorStop(1, bgDark ? 'hsla(48,100%,72%,0)' : 'hsla(38,95%,52%,0)');
+      bctx.fillStyle = g;
+      bctx.fillRect(o.x - 14, o.y - 14, 28, 28);
+    });
+    bctx.globalCompositeOperation = 'source-over';
+  },
+  /* ระลอกน้ำ: วงคลื่นแผ่ออกแบบหยดน้ำ */
+  ripples(t) {
     bctx.clearRect(0, 0, bgW, bgH);
     const S = bgState;
-    if (bgDark) {
-      S.stars.forEach(st => {
-        const a = .3 + .7 * (.5 + .5 * Math.sin(t * st.sp + st.ph));
-        bctx.fillStyle = `rgba(255,255,255,${(a * .8).toFixed(3)})`;
-        bctx.beginPath(); bctx.arc(st.x, st.y, st.r, 0, 6.283); bctx.fill();
-      });
-      if (!S.sh && t > S.next) S.sh = { x: rnd(bgW * .3, bgW), y: rnd(0, bgH * .4), vx: -rnd(500, 800), vy: rnd(250, 400), life: 0 };
-      if (S.sh) {
-        const sh = S.sh, mag = Math.hypot(sh.vx, sh.vy), len = 130;
-        sh.x += sh.vx * dt; sh.y += sh.vy * dt; sh.life += dt;
-        const tx = sh.x - sh.vx / mag * len, ty = sh.y - sh.vy / mag * len;
-        const g = bctx.createLinearGradient(sh.x, sh.y, tx, ty);
-        g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-        bctx.strokeStyle = g; bctx.lineWidth = 1.6;
-        bctx.beginPath(); bctx.moveTo(sh.x, sh.y); bctx.lineTo(tx, ty); bctx.stroke();
-        if (sh.life > 1.6 || sh.x < -len || sh.y > bgH + len) { S.sh = null; S.next = t + rnd(4000, 12000); }
+    if (t > S.next) { S.rings.push({ x: rnd(bgW * .05, bgW * .95), y: rnd(bgH * .1, bgH * .95), t0: t }); S.next = t + rnd(450, 1100); }
+    S.rings = S.rings.filter(o => t - o.t0 < 3200);
+    bctx.lineWidth = 1.5;
+    S.rings.forEach(o => {
+      const p = (t - o.t0) / 3200;
+      for (let k = 0; k < 3; k++) {
+        const rr = p * 150 - k * 14;
+        if (rr <= 0) continue;
+        bctx.strokeStyle = bgDark ? `hsla(200,90%,75%,${(1 - p) * .55})` : `hsla(210,70%,45%,${(1 - p) * .5})`;
+        bctx.beginPath(); bctx.ellipse(o.x, o.y, rr, rr * .45, 0, 0, 6.283); bctx.stroke();
       }
-    } else {
-      S.clouds.forEach(c => {
-        c.x += c.v * dt;
-        if (c.x - c.sz * 2 > bgW) c.x = -c.sz * 2;
-        c.puffs.forEach(p => {
-          const cx = c.x + p.dx, cy = c.y + p.dy;
-          const sh = bctx.createRadialGradient(cx, cy + p.r * .18, 0, cx, cy + p.r * .18, p.r);
-          sh.addColorStop(0, 'rgba(110,140,195,.2)'); sh.addColorStop(1, 'rgba(110,140,195,0)');
-          bctx.fillStyle = sh; bctx.beginPath(); bctx.arc(cx, cy + p.r * .18, p.r, 0, 6.283); bctx.fill();
-          const g = bctx.createRadialGradient(cx, cy, 0, cx, cy, p.r);
-          g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-          bctx.fillStyle = g; bctx.beginPath(); bctx.arc(cx, cy, p.r, 0, 6.283); bctx.fill();
-        });
+    });
+  },
+  /* Bokeh: วงกลมโบเก้ลอยขึ้น */
+  bokeh(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.globalCompositeOperation = bgDark ? 'lighter' : 'source-over';
+    bgState.items.forEach(o => {
+      o.y -= o.v * dt;
+      if (o.y < -o.r) { o.y = bgH + o.r; o.x = rnd(0, bgW); }
+      const hue = (bgAccent.h + o.hOff + 360) % 360;
+      bctx.fillStyle = `hsla(${hue},80%,${bgDark ? 62 : 60}%,${o.a})`;
+      bctx.beginPath(); bctx.arc(o.x, o.y, o.r, 0, 6.283); bctx.fill();
+      bctx.strokeStyle = bgDark ? `rgba(255,255,255,${o.a * .8})` : `hsla(${hue},70%,45%,${o.a * 1.2})`;
+      bctx.lineWidth = 1; bctx.stroke();
+    });
+    bctx.globalCompositeOperation = 'source-over';
+  },
+  /* ประกายไฟ: สะเก็ดไฟลอยขึ้นและจางหาย */
+  embers(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.globalCompositeOperation = bgDark ? 'lighter' : 'source-over';
+    bgState.items.forEach(o => {
+      o.y -= o.v * dt; o.x += Math.sin(t / 400 + o.w) * 18 * dt; o.l -= .16 * dt;
+      if (o.l <= 0 || o.y < -5) { o.y = bgH + 5; o.x = rnd(0, bgW); o.l = 1; }
+      bctx.fillStyle = bgDark ? `hsla(24,100%,60%,${o.l * .9})` : `hsla(18,90%,50%,${o.l * .75})`;
+      bctx.beginPath(); bctx.arc(o.x, o.y, 1.6 * o.l + .5, 0, 6.283); bctx.fill();
+    });
+    bctx.globalCompositeOperation = 'source-over';
+  },
+  /* ดาวตก: ริ้วแสงพาดเฉียง */
+  meteors(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    const S = bgState;
+    if (Math.random() < 1.2 * dt) S.items.push({ x: rnd(bgW * .25, bgW * 1.1), y: rnd(-40, bgH * .3), v: rnd(560, 880), l: rnd(120, 240), a: 1 });
+    const col = a => bgDark ? `rgba(255,255,255,${a})` : `hsla(${bgAccent.h},75%,48%,${a})`;
+    bctx.lineWidth = 1.8; bctx.lineCap = 'round';
+    for (let i = S.items.length - 1; i >= 0; i--) {
+      const o = S.items[i];
+      o.x -= o.v * .87 * dt; o.y += o.v * .5 * dt; o.a -= .45 * dt;
+      if (o.a <= 0 || o.x < -o.l || o.y > bgH + o.l) { S.items.splice(i, 1); continue; }
+      const tx = o.x + o.l * .87, ty = o.y - o.l * .5;
+      const g = bctx.createLinearGradient(o.x, o.y, tx, ty);
+      g.addColorStop(0, col(o.a)); g.addColorStop(1, col(0));
+      bctx.strokeStyle = g;
+      bctx.beginPath(); bctx.moveTo(o.x, o.y); bctx.lineTo(tx, ty); bctx.stroke();
+    }
+    bctx.lineCap = 'butt';
+  },
+  /* ฝนนีออน: เส้นแสงสีฟ้า/ชมพูตกเร็วๆ */
+  neon(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.lineWidth = 1.4;
+    bgState.items.forEach(o => {
+      o.y += o.v * dt;
+      if (o.y - o.l > bgH) { o.y = -5; o.x = rnd(0, bgW); }
+      const h = o.c ? 325 : 188;
+      const base = bgDark ? `hsla(${h},95%,64%,` : `hsla(${h},85%,45%,`;
+      const g = bctx.createLinearGradient(0, o.y - o.l, 0, o.y);
+      g.addColorStop(0, base + '0)'); g.addColorStop(1, base + (bgDark ? '.85)' : '.7)'));
+      bctx.strokeStyle = g;
+      bctx.beginPath(); bctx.moveTo(o.x, o.y - o.l); bctx.lineTo(o.x, o.y); bctx.stroke();
+    });
+  },
+  /* กลีบซากุระ: ร่วงพร้อมหมุนเบาๆ */
+  sakura(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.fillStyle = bgDark ? 'rgba(249,168,212,.75)' : 'rgba(236,110,165,.7)';
+    bgState.items.forEach(o => {
+      o.y += o.v * dt; o.x += Math.sin(t / 600 + o.w) * 28 * dt; o.r += 1.6 * dt;
+      if (o.y > bgH + 14) { o.y = -14; o.x = rnd(0, bgW); }
+      bctx.save(); bctx.translate(o.x, o.y); bctx.rotate(o.r);
+      bctx.beginPath(); bctx.ellipse(0, 0, o.s, o.s * .55, 0, 0, 6.283); bctx.fill();
+      bctx.restore();
+    });
+  },
+  /* ฟองสบู่: ลอยขึ้นพร้อมประกายสะท้อน */
+  bubbles(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.lineWidth = 1;
+    bgState.items.forEach(o => {
+      o.y -= o.v * dt; o.x += Math.sin(t / 700 + o.w) * 14 * dt;
+      if (o.y < -o.r - 4) { o.y = bgH + o.r + 4; o.x = rnd(0, bgW); }
+      bctx.fillStyle = bgDark ? 'rgba(125,211,252,.08)' : 'rgba(80,140,220,.08)';
+      bctx.strokeStyle = bgDark ? 'rgba(186,230,253,.55)' : 'rgba(70,120,200,.5)';
+      bctx.beginPath(); bctx.arc(o.x, o.y, o.r, 0, 6.283); bctx.fill(); bctx.stroke();
+      bctx.strokeStyle = bgDark ? 'rgba(255,255,255,.7)' : 'rgba(255,255,255,.95)';
+      bctx.beginPath(); bctx.arc(o.x, o.y, o.r * .7, 3.6, 4.4); bctx.stroke();
+    });
+  },
+  /* เมฆลอย: ก้อนเมฆนุ่มๆ ลอยผ่านช้าๆ */
+  clouds(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.globalCompositeOperation = bgDark ? 'lighter' : 'source-over';
+    bgState.items.forEach(o => {
+      o.x += o.v * dt;
+      const ext = o.r * 4;
+      if (o.x - ext > bgW) o.x = -ext;
+      [[-1.1, .05, .8], [0, -.2, 1], [1.1, .05, .8]].forEach(([dx, dy, k]) => {
+        const r = o.r * k;
+        bctx.save(); bctx.translate(o.x + dx * o.r * 1.4, o.y + dy * o.r); bctx.scale(1.7, 1);
+        const c0 = bgDark ? (o.tone ? '139,92,246' : '96,165,250') : '255,255,255';
+        const g = bctx.createRadialGradient(0, 0, 0, 0, 0, r);
+        g.addColorStop(0, `rgba(${c0},${bgDark ? .2 : .5})`); g.addColorStop(1, `rgba(${c0},0)`);
+        bctx.fillStyle = g;
+        bctx.beginPath(); bctx.arc(0, 0, r, 0, 6.283); bctx.fill();
+        bctx.restore();
       });
-    }
-  },
-  network(t, dt) {
-    bctx.clearRect(0, 0, bgW, bgH);
-    const pts = bgState.pts, L = 140;
-    const col = a => `hsla(${bgAccent.h},${Math.max(60, bgAccent.s)}%,${bgDark ? 70 : 45}%,${a})`;
-    pts.forEach(p => {
-      p.x += p.vx * dt; p.y += p.vy * dt;
-      if (p.x < 0 || p.x > bgW) p.vx *= -1;
-      if (p.y < 0 || p.y > bgH) p.vy *= -1;
     });
-    bctx.lineWidth = 1;
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i + 1; j < pts.length; j++) {
-        const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
-        if (d < L) {
-          bctx.strokeStyle = col(((1 - d / L) * .35).toFixed(3));
-          bctx.beginPath(); bctx.moveTo(pts[i].x, pts[i].y); bctx.lineTo(pts[j].x, pts[j].y); bctx.stroke();
-        }
-      }
-    }
-    bctx.fillStyle = col(.7);
-    pts.forEach(p => { bctx.beginPath(); bctx.arc(p.x, p.y, p.r, 0, 6.283); bctx.fill(); });
-  },
-  rain(t, dt) {
-    bctx.clearRect(0, 0, bgW, bgH);
-    bctx.strokeStyle = bgDark ? 'rgba(170,195,255,.35)' : 'rgba(70,100,170,.35)';
-    bctx.lineWidth = 1;
-    bctx.beginPath();
-    bgState.drops.forEach(d => {
-      bctx.moveTo(d.x, d.y); bctx.lineTo(d.x + d.l * .15, d.y + d.l);
-      d.y += d.v * dt; d.x += d.v * .15 * dt;
-      if (d.y > bgH) { d.y = -d.l; d.x = rnd(-bgH * .15, bgW); }
-      if (d.x > bgW) d.x = -10;
-    });
-    bctx.stroke();
-  },
-  snow(t, dt) {
-    bctx.clearRect(0, 0, bgW, bgH);
-    bctx.fillStyle = bgDark ? 'rgba(255,255,255,.8)' : 'rgba(120,150,210,.75)';
-    bgState.flakes.forEach(f => {
-      f.y += f.v * dt;
-      f.x += Math.sin(t * .001 * f.sw + f.ph) * 16 * dt;
-      if (f.y > bgH + 5) { f.y = -5; f.x = rnd(0, bgW); }
-      bctx.beginPath(); bctx.arc(f.x, f.y, f.r, 0, 6.283); bctx.fill();
-    });
+    bctx.globalCompositeOperation = 'source-over';
   }
 };
 
@@ -1323,6 +1571,7 @@ $('#bgBtn').onclick = e => {
   bgMode = BG_MODES[(i + 1) % BG_MODES.length].id;
   save('bgMode2', bgMode);
   startBg();
+  showBgToast(); /* แสดงชื่อโหมดสั้นๆ */
 };
 let bgResizeTimer;
 addEventListener('resize', () => { clearTimeout(bgResizeTimer); bgResizeTimer = setTimeout(resizeBg, 150); });
@@ -1494,7 +1743,7 @@ function makeTile(l, i) {
 
 /* สร้าง 1 โฟลเดอร์ (g.id = null คือ "ทั่วไป") */
 function makeSection(g, items) {
-  const sec = document.createElement('section');
+  const sec = document.createElement('div');
   sec.className = 'fold' + (g.collapsed ? ' collapsed' : '') + (g.color ? '' : ' plain');
   if (g.color) sec.style.setProperty('--fc', g.color);
 
@@ -1663,6 +1912,57 @@ $('#grpForm').addEventListener('submit', e => {
   else groups.push({ id: newGid(), name, color: grpColor, collapsed: false });
   saveGroups(); renderLinks(); grpDlg.close();
 });
+
+/* ---------- ซ่อน/แสดงแถบ และแถบเครื่องมือ ---------- */
+/* panelHidden = สถานะซ่อนของแต่ละแถบ, toolsCollapsed = ซ่อนแถบเครื่องมือ (ปุ่ม < >),
+   panelsBackup = สถานะแถบก่อนกดซ่อนเครื่องมือ (ไว้คืนค่าตอนกดขยาย) */
+const PANEL_SEL = { cal: '#panelCalendar', todo: '#panelTodo', dash: '#panelDashboard' };
+const PANEL_NAME = { cal: 'ปฏิทิน', todo: 'ภารกิจ', dash: 'แดชบอร์ด' };
+const CHEV_LEFT = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
+const CHEV_RIGHT = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+let panelHidden = Object.assign({ cal: false, todo: false, dash: false }, load('panelHidden', {}));
+let toolsCollapsed = load('toolsCollapsed', false);
+let panelsBackup = load('panelsBackup', null);
+
+function applyLayoutState() {
+  const keys = Object.keys(PANEL_SEL);
+  keys.forEach(k => $(PANEL_SEL[k]).classList.toggle('is-hidden', !!panelHidden[k]));
+  const hiddenCount = keys.filter(k => panelHidden[k]).length;
+  const wrapEl = document.querySelector('.wrap');
+  wrapEl.classList.toggle('compact', hiddenCount > 0 && hiddenCount < keys.length); /* ซ่อนบางแถบ: แถบที่เหลือขยายเต็ม */
+  wrapEl.classList.toggle('centered', hiddenCount === keys.length);                 /* ซ่อนหมด: แถบค้นหาอยู่กลางจอ */
+  wrapEl.classList.toggle('tools-collapsed', toolsCollapsed);
+  $$('#panelToggles .pt-btn').forEach(b => {
+    const k = b.dataset.panel, off = !!panelHidden[k];
+    b.classList.toggle('off', off);
+    b.querySelector('b').textContent = off ? '+' : '\u2212';
+    b.setAttribute('aria-label', (off ? 'แสดง' : 'ซ่อน') + PANEL_NAME[k]);
+    b.title = (off ? 'แสดง' : 'ซ่อน') + PANEL_NAME[k];
+  });
+  const t = $('#toolsToggle');
+  t.innerHTML = toolsCollapsed ? CHEV_LEFT : CHEV_RIGHT; /* < = ขยายออกมา, > = ซ่อนไปทางขวา */
+  t.setAttribute('aria-expanded', String(!toolsCollapsed));
+  const tl = toolsCollapsed ? 'แสดงแถบเครื่องมือ' : 'ซ่อนแถบเครื่องมือ';
+  t.setAttribute('aria-label', tl); t.title = tl;
+  save('panelHidden', panelHidden); save('toolsCollapsed', toolsCollapsed); save('panelsBackup', panelsBackup);
+}
+$$('#panelToggles .pt-btn').forEach(b => {
+  b.onclick = () => { panelHidden[b.dataset.panel] = !panelHidden[b.dataset.panel]; applyLayoutState(); };
+});
+$('#toolsToggle').onclick = () => {
+  if (!toolsCollapsed) { /* ซ่อน: เก็บสถานะแถบไว้ แล้วซ่อนทุกแถบ ให้แถบค้นหาลงมากลางจอ */
+    panelsBackup = Object.assign({}, panelHidden);
+    Object.keys(panelHidden).forEach(k => { panelHidden[k] = true; });
+    toolsCollapsed = true;
+    $('#colorPop').hidden = true; $('#bgPop').hidden = true;
+  } else { /* ขยาย: คืนสถานะแถบเดิม */
+    panelHidden = panelsBackup ? Object.assign({ cal: false, todo: false, dash: false }, panelsBackup) : { cal: false, todo: false, dash: false };
+    panelsBackup = null;
+    toolsCollapsed = false;
+  }
+  applyLayoutState();
+};
+applyLayoutState();
 
 /* ---------- แถบด้านข้าง (ปุ่ม 3 ขีด) ---------- */
 const sideEl = $('#side'), scrimEl = $('#sideScrim'), menuBtn = $('#menuBtn');
