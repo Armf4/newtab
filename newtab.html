@@ -1002,6 +1002,9 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
 .ic-grid button:hover{border-color:var(--accent)}
 .ic-grid button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,transparent)}
 .ic-hint{font-size:12px;color:var(--mute);margin-top:6px}
+/* รายการตัวเลือกในดรอปดาวน์ ให้พื้น/ตัวอักษรตามธีม (กันพื้นขาวตัวอ่อน) */
+select option,select optgroup{background:var(--panel);color:var(--ink)}
+select option:checked{background:color-mix(in srgb,var(--accent) 35%,var(--panel));color:var(--ink)}
 </style>
 </head>
 <body>
