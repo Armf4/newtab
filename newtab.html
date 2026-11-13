@@ -183,7 +183,7 @@ main{
 }
 
 main > section{flex: 0 0 auto; min-width: 220px}
-#panelDashboard{flex: 1 1 240px}
+main > section.fill{flex: 1 1 240px}
 
 
 .left-column{
@@ -522,7 +522,6 @@ dialog select:focus{outline:0;border-color:var(--accent)}
 }
 .tools-toggle:active{box-shadow:inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light)}
 .wrap.tools-collapsed .header-actions > :not(.tools-toggle){display:none !important}
-.wrap.tools-collapsed .panel-toggles{display:none}
 .wrap.centered main{display:none}
 .wrap.compact .col-resizer,.wrap.centered .col-resizer{display:none}
 @media (min-width:901px){
@@ -1005,6 +1004,41 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
 /* รายการตัวเลือกในดรอปดาวน์ ให้พื้น/ตัวอักษรตามธีม (กันพื้นขาวตัวอ่อน) */
 select option,select optgroup{background:var(--panel);color:var(--ink)}
 select option:checked{background:color-mix(in srgb,var(--accent) 35%,var(--panel));color:var(--ink)}
+/* ดรอปดาวน์โฟลเดอร์แบบกำหนดเอง: พื้นกระจกเหมือนแอป */
+.dd{position:relative}
+.dd-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;cursor:pointer;
+  border:1.5px solid color-mix(in srgb,var(--accent) 65%,transparent);background:var(--panel);color:var(--ink);
+  border-radius:10px;padding:10px 14px;box-shadow:inset 3px 3px 6px var(--shadow-dark),inset -3px -3px 6px var(--shadow-light)}
+.dd-btn:focus-visible,.dd-btn[aria-expanded=true]{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+.dd-btn i{font-size:18px;color:var(--mute);transition:transform .15s}
+.dd-btn[aria-expanded=true] i{transform:rotate(180deg)}
+.dd-list{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;max-height:210px;overflow:auto;padding:6px;
+  background:var(--lg-pop,var(--panel));-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
+  border:1px solid var(--lg-bd,var(--line));border-radius:16px;box-shadow:inset 0 1px 0 var(--lg-hi,transparent),0 18px 40px rgba(0,0,0,.4)}
+.dd-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:12px;background:transparent;color:var(--ink);font-size:14px;font-weight:500;cursor:pointer;text-align:left}
+.dd-item i{font-size:18px;flex:0 0 auto;color:var(--fc,var(--mute))}
+.dd-item .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-item .ck{color:var(--fc,var(--accent));visibility:hidden}
+.dd-item:hover,.dd-item.act{background:color-mix(in srgb,var(--ink) 9%,transparent)}
+.dd-item[aria-selected=true]{background:color-mix(in srgb,var(--fc,var(--accent)) 16%,transparent);color:var(--fc,var(--ink))}
+.dd-item[aria-selected=true] .ck{visibility:visible}
+/* ปุ่มไอคอนปฏิทิน ซ่อน/แสดงทั้ง 3 แถบ */
+.wrap .pt-all{color:var(--accent)}
+.wrap .pt-all.off{color:var(--mute);box-shadow:inset 2px 2px 4px var(--shadow-dark),inset -2px -2px 4px var(--shadow-light)}
+:root[data-ui=glass] .wrap .pt-all.off{background:transparent;box-shadow:none}
+/* ลากสลับตำแหน่งแถบ (ปฏิทิน / ภารกิจ / แดชบอร์ด) */
+main > section{position:relative}
+.panel-grip{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:38px;height:16px;display:grid;place-items:center;color:var(--mute);opacity:.55;cursor:grab;border-radius:8px;touch-action:none;z-index:2;transition:opacity .15s,background .15s}
+.panel-grip:hover,.panel-grip:focus-visible{opacity:1;background:color-mix(in srgb,var(--ink) 10%,transparent);outline:0}
+.drag-title{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.panel-drag{z-index:30;opacity:.94;scale:1.025;box-shadow:0 28px 64px rgba(0,0,0,.5) !important;will-change:translate,rotate;
+  transition:scale .28s cubic-bezier(.2,1.2,.3,1),rotate .22s ease-out,box-shadow .28s,opacity .2s !important}
+.panel-drop{outline:2px dashed var(--accent);outline-offset:-4px}
+.panel-shift{transition:translate .42s cubic-bezier(.2,1.15,.3,1) !important}
+.panel-land{z-index:25}
+.panel-land-top{z-index:26}
+@media (prefers-reduced-motion:reduce){.panel-drag,.panel-shift{transition:none !important}}
+body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
 </style>
 </head>
 <body>
@@ -1022,10 +1056,8 @@ select option:checked{background:color-mix(in srgb,var(--accent) 35%,var(--panel
         <div class="bg-pop" id="bgPop" hidden></div>
         <button class="tools-toggle" id="toolsToggle" type="button" aria-expanded="true" aria-label="ซ่อนแถบเครื่องมือ" title="ซ่อนแถบเครื่องมือ"></button>
       </div>
-      <div class="panel-toggles" id="panelToggles" role="group" aria-label="ซ่อนหรือแสดงแถบ">
-        <button class="pt-btn" type="button" data-panel="cal"><b>&minus;</b>ปฏิทิน</button>
-        <button class="pt-btn" type="button" data-panel="todo"><b>&minus;</b>ภารกิจ</button>
-        <button class="pt-btn" type="button" data-panel="dash"><b>&minus;</b>แดชบอร์ด</button>
+      <div class="panel-toggles" id="panelToggles">
+        <button class="tools-toggle pt-all" id="panelAllBtn" type="button" aria-pressed="true" aria-label="ซ่อนปฏิทิน ภารกิจ และแดชบอร์ด" title="ซ่อนปฏิทิน ภารกิจ และแดชบอร์ด"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M3.5 10.2h17M8 3v4M16 3v4"/></svg></button>
       </div>
       <div class="clock-container">
         <div class="clock" id="clock">00:00</div>
@@ -1179,6 +1211,14 @@ select option:checked{background:color-mix(in srgb,var(--accent) 35%,var(--panel
 <dialog id="dlg">
   <form id="linkForm" method="dialog">
     <h3 id="linkTitle">เพิ่มทางลัด</h3>
+    <div id="grpWrap" hidden>
+      <label id="grpLbl" style="margin-top:0">โฟลเดอร์</label>
+      <select id="grp" hidden></select>
+      <div class="dd" id="grpDd">
+        <button type="button" class="dd-btn" id="grpBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="grpLbl grpBtnTxt"><span id="grpBtnTxt"></span><i class="ri-arrow-down-s-line" aria-hidden="true"></i></button>
+        <div class="dd-list" id="grpList" role="listbox" aria-labelledby="grpLbl" hidden></div>
+      </div>
+    </div>
     <label for="url">ที่อยู่เว็บไซต์ (URL)</label>
     <input id="url" type="text" placeholder="youtube.com" autocomplete="off">
     <label for="name">ชื่อ (ไม่ใส่ก็ได้)</label>
@@ -1195,10 +1235,6 @@ select option:checked{background:color-mix(in srgb,var(--accent) 35%,var(--panel
     </div>
     <div class="ic-grid" id="icGrid" role="listbox" aria-label="เลือกไอคอน"></div>
     <div class="ic-hint" id="icHint"></div>
-    <div id="grpWrap" hidden>
-      <label for="grp">โฟลเดอร์</label>
-      <select id="grp"></select>
-    </div>
     <div class="err" id="err" role="alert"></div>
     <div class="actions">
       <button class="btn ghost" type="button" id="cancel">ยกเลิก</button>
@@ -1971,7 +2007,47 @@ function fillGroupSelect(selected) {
   });
   sel.value = groups.some(g => g.id === selected) ? selected : '';
   $('#grpWrap').hidden = !groups.length;
+  renderGrpDd();
 }
+
+/* ---------- ดรอปดาวน์เลือกโฟลเดอร์ (แทน select ของเบราว์เซอร์) ---------- */
+const grpBtn = $('#grpBtn'), grpList = $('#grpList');
+function setGrpDd(open) {
+  grpList.hidden = !open;
+  grpBtn.setAttribute('aria-expanded', String(open));
+}
+function renderGrpDd() {
+  const sel = $('#grp');
+  grpList.textContent = '';
+  const opts = [{ id: '', name: 'ทั่วไป (ไม่อยู่โฟลเดอร์)', color: null }, ...groups];
+  opts.forEach(g => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'dd-item'; b.setAttribute('role', 'option');
+    b.dataset.v = g.id;
+    if (g.color) b.style.setProperty('--fc', g.color);
+    b.setAttribute('aria-selected', String(sel.value === g.id));
+    b.innerHTML = '<i class="' + (g.id ? 'ri-folder-3-line' : 'ri-inbox-line') + '" aria-hidden="true"></i><span class="tx"></span><i class="ri-check-line ck" aria-hidden="true"></i>';
+    b.querySelector('.tx').textContent = g.name;
+    b.onclick = () => { sel.value = g.id; renderGrpDd(); setGrpDd(false); grpBtn.focus(); };
+    grpList.appendChild(b);
+  });
+  const cur = opts.find(g => g.id === sel.value) || opts[0];
+  $('#grpBtnTxt').textContent = cur.name;
+  setGrpDd(false);
+}
+grpBtn.onclick = () => setGrpDd(grpList.hidden);
+document.addEventListener('click', e => { if (!grpList.hidden && !$('#grpDd').contains(e.target)) setGrpDd(false); });
+$('#grpDd').addEventListener('keydown', e => {
+  const items = [...grpList.querySelectorAll('.dd-item')];
+  if (e.key === 'Escape' && !grpList.hidden) { e.preventDefault(); e.stopPropagation(); setGrpDd(false); grpBtn.focus(); return; }
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (grpList.hidden) { setGrpDd(true); }
+    const i = items.indexOf(document.activeElement);
+    const n = e.key === 'ArrowDown' ? Math.min(items.length - 1, i + 1) : Math.max(0, i - 1);
+    items[i < 0 ? items.findIndex(x => x.getAttribute('aria-selected') === 'true') : n]?.focus();
+  }
+});
 function openDialog(idx = null, gid = null) {
   editIdx = idx;
   const l = idx !== null ? links[idx] : null;
@@ -2074,13 +2150,12 @@ function applyLayoutState() {
   wrapEl.classList.toggle('compact', hiddenCount > 0 && hiddenCount < keys.length); /* ซ่อนบางแถบ: แถบที่เหลือขยายเต็ม */
   wrapEl.classList.toggle('centered', hiddenCount === keys.length);                 /* ซ่อนหมด: แถบค้นหาอยู่กลางจอ */
   wrapEl.classList.toggle('tools-collapsed', toolsCollapsed);
-  $$('#panelToggles .pt-btn').forEach(b => {
-    const k = b.dataset.panel, off = !!panelHidden[k];
-    b.classList.toggle('off', off);
-    b.querySelector('b').textContent = off ? '+' : '\u2212';
-    b.setAttribute('aria-label', (off ? 'แสดง' : 'ซ่อน') + PANEL_NAME[k]);
-    b.title = (off ? 'แสดง' : 'ซ่อน') + PANEL_NAME[k];
-  });
+  /* ปุ่มไอคอนปฏิทิน: ซ่อนอยู่ทั้งหมด = สถานะ off */
+  const pb = $('#panelAllBtn'), allOff = hiddenCount === keys.length;
+  pb.classList.toggle('off', allOff);
+  pb.setAttribute('aria-pressed', String(!allOff));
+  const pl = (allOff ? 'แสดง' : 'ซ่อน') + 'ปฏิทิน ภารกิจ และแดชบอร์ด';
+  pb.setAttribute('aria-label', pl); pb.title = pl;
   const t = $('#toolsToggle');
   t.innerHTML = toolsCollapsed ? CHEV_LEFT : CHEV_RIGHT; /* < = ขยายออกมา, > = ซ่อนไปทางขวา */
   t.setAttribute('aria-expanded', String(!toolsCollapsed));
@@ -2088,9 +2163,15 @@ function applyLayoutState() {
   t.setAttribute('aria-label', tl); t.title = tl;
   save('panelHidden', panelHidden); save('toolsCollapsed', toolsCollapsed); save('panelsBackup', panelsBackup);
 }
-$$('#panelToggles .pt-btn').forEach(b => {
-  b.onclick = () => { panelHidden[b.dataset.panel] = !panelHidden[b.dataset.panel]; applyLayoutState(); };
-});
+/* กดปุ่มปฏิทิน: ถ้ายังมีแถบแสดงอยู่ ซ่อนทั้ง 3 แถบ / ถ้าซ่อนหมดแล้ว แสดงทั้ง 3 แถบ */
+$('#panelAllBtn').onclick = () => {
+  const keys = Object.keys(PANEL_SEL);
+  const hideAll = keys.some(k => !panelHidden[k]);
+  keys.forEach(k => { panelHidden[k] = hideAll; });
+  /* ปุ่มนี้อยู่แยกจากแถบเครื่องมือ: ถ้ากดแสดงแถบขณะที่แถบเครื่องมือถูกพับอยู่ ให้คลี่แถบเครื่องมือออกด้วย */
+  if (!hideAll && toolsCollapsed) { toolsCollapsed = false; panelsBackup = null; }
+  applyLayoutState();
+};
 $('#toolsToggle').onclick = () => {
   if (!toolsCollapsed) { /* ซ่อน: เก็บสถานะแถบไว้ แล้วซ่อนทุกแถบ ให้แถบค้นหาลงมากลางจอ */
     panelsBackup = Object.assign({}, panelHidden);
@@ -2260,52 +2341,72 @@ function setTodoTimeUI(value) {
   $('#customTimeWrap').style.display = matchesChip ? 'none' : 'flex';
 }
 
-/* ---------- ปรับความกว้าง 3 คอลัมน์ (ปฏิทิน / ภารกิจ / แดชบอร์ด) ด้วยเมาส์ ---------- */
+/* ---------- ปรับความกว้าง + ลากสลับตำแหน่ง 3 คอลัมน์ (ปฏิทิน / ภารกิจ / แดชบอร์ด) ด้วยเมาส์ ---------- */
+/* โครงสร้าง: main = [แถบ 1, ตัวปรับ 1, แถบ 2, ตัวปรับ 2, แถบ 3]
+   - 2 แถบแรกมีความกว้างคงที่ (เก็บแยกตามแถบ) แถบสุดท้ายยืดเต็มที่ที่เหลือ
+   - ลากที่ไอคอนจุด 6 จุดบนหัวแถบ หรือลากที่ชื่อหัวข้อ ไปวางบนอีกแถบเพื่อสลับตำแหน่ง */
 function initResizablePanels() {
   const mainEl = document.querySelector('main');
-  const calEl = $('#panelCalendar');
-  const todoEl = $('#panelTodo');
+  const r1 = $('#resizer1'), r2 = $('#resizer2');
+  const EL = { cal: $('#panelCalendar'), todo: $('#panelTodo'), dash: $('#panelDashboard') };
+  const NAME = { cal: 'ปฏิทิน', todo: 'ภารกิจ', dash: 'แดชบอร์ด' };
+  const KEYS = Object.keys(EL);
   const RESIZER_TOTAL = 48; // ความกว้างรวมของ resizer 2 อัน
   const MIN_PANEL = 220;
-  const MIN_DASHBOARD = 220;
+  const MIN_LAST = 220;
+  const keyOf = el => KEYS.find(k => EL[k] === el);
+  const isHidden = k => EL[k].classList.contains('is-hidden');
 
-  const stored = load('panelWidths', null);
-  if (stored && stored.calendar && stored.todo) {
-    calEl.style.width = stored.calendar + 'px';
-    todoEl.style.width = stored.todo + 'px';
-  } else {
-    const total = mainEl.getBoundingClientRect().width - RESIZER_TOTAL;
-    const unit = total / 5; // สัดส่วนเดิม 2 : 2 : 1
-    calEl.style.width = Math.max(MIN_PANEL, unit * 2) + 'px';
-    todoEl.style.width = Math.max(MIN_PANEL, unit * 2) + 'px';
-  }
+  /* ลำดับแถบที่บันทึกไว้ (ข้อมูลเสียให้กลับเป็นลำดับเดิม) */
+  let order = load('panelOrder', KEYS);
+  if (!Array.isArray(order) || order.length !== 3 || !KEYS.every(k => order.includes(k))) order = KEYS.slice();
+  const sections = () => order.map(k => EL[k]);
+  const placeDom = () => { const [a, b, c] = sections(); mainEl.append(a, r1, b, r2, c); };
 
-  function persistWidths() {
-    save('panelWidths', {
-      calendar: Math.round(calEl.getBoundingClientRect().width),
-      todo: Math.round(todoEl.getBoundingClientRect().width)
+  /* ความกว้างของแต่ละแถบ (ค่าเดิม 2 : 2 : 1) */
+  const stored = load('panelWidths', null) || {};
+  const unit = (mainEl.getBoundingClientRect().width - RESIZER_TOTAL) / 5;
+  const W = {
+    cal: stored.calendar || Math.max(MIN_PANEL, unit * 2),
+    todo: stored.todo || Math.max(MIN_PANEL, unit * 2),
+    dash: stored.dashboard || Math.max(MIN_PANEL, unit)
+  };
+  function applyWidths() {
+    sections().forEach((el, i) => {
+      el.classList.toggle('fill', i === 2); /* แถบสุดท้ายยืดเต็ม */
+      el.style.width = i === 2 ? '' : Math.round(W[keyOf(el)]) + 'px';
     });
+    r1.setAttribute('aria-label', 'ปรับความกว้าง' + NAME[order[0]]);
+    r2.setAttribute('aria-label', 'ปรับความกว้าง' + NAME[order[1]]);
+  }
+  function saveWidths() {
+    save('panelWidths', { calendar: Math.round(W.cal), todo: Math.round(W.todo), dashboard: Math.round(W.dash) });
+  }
+  function persistWidths() {
+    sections().slice(0, 2).forEach(el => {
+      const w = Math.round(el.getBoundingClientRect().width);
+      if (w > 0) W[keyOf(el)] = w;
+    });
+    saveWidths();
   }
 
-  function setupResizer(resizerEl, panelEl, otherEl) {
+  /* ปรับความกว้าง: ตัวปรับแต่ละตัวปรับแถบที่อยู่ทางซ้ายของมัน */
+  function setupResizer(resizerEl, idx) {
     function clampWidth(newWidth) {
+      const otherEl = sections()[1 - idx];
       const mainWidth = mainEl.getBoundingClientRect().width;
-      const otherWidth = otherEl.getBoundingClientRect().width;
-      const maxWidth = mainWidth - RESIZER_TOTAL - otherWidth - MIN_DASHBOARD;
+      const maxWidth = mainWidth - RESIZER_TOTAL - otherEl.getBoundingClientRect().width - MIN_LAST;
       return Math.max(MIN_PANEL, Math.min(newWidth, maxWidth));
     }
-
     resizerEl.addEventListener('pointerdown', e => {
       e.preventDefault();
+      const panelEl = sections()[idx];
       resizerEl.setPointerCapture(e.pointerId);
       const startX = e.clientX;
       const startWidth = panelEl.getBoundingClientRect().width;
       resizerEl.classList.add('dragging');
       document.body.style.userSelect = 'none';
-
-      function onMove(ev) {
-        panelEl.style.width = clampWidth(startWidth + (ev.clientX - startX)) + 'px';
-      }
+      function onMove(ev) { panelEl.style.width = clampWidth(startWidth + (ev.clientX - startX)) + 'px'; }
       function onUp() {
         resizerEl.releasePointerCapture(e.pointerId);
         resizerEl.removeEventListener('pointermove', onMove);
@@ -2317,18 +2418,186 @@ function initResizablePanels() {
       resizerEl.addEventListener('pointermove', onMove);
       resizerEl.addEventListener('pointerup', onUp);
     });
-
     resizerEl.addEventListener('keydown', e => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       e.preventDefault();
+      const panelEl = sections()[idx];
       const step = e.key === 'ArrowRight' ? 20 : -20;
       panelEl.style.width = clampWidth(panelEl.getBoundingClientRect().width + step) + 'px';
       persistWidths();
     });
   }
 
-  setupResizer($('#resizer1'), calEl, todoEl);
-  setupResizer($('#resizer2'), todoEl, calEl);
+  /* ---------- โมชั่นตอนสลับ (FLIP): วัดตำแหน่งก่อน/หลัง แล้วไหลจากที่เก่าไปที่ใหม่แบบสปริง ---------- */
+  const REDUCE = matchMedia('(prefers-reduced-motion: reduce)');
+  const SPRING = 'cubic-bezier(.2,1.12,.3,1)';   /* เด้งเล็กน้อยตอนถึงที่ */
+  const SMOOTH = 'cubic-bezier(.22,1,.36,1)';    /* นุ่ม ไม่เด้ง (ใช้กับความกว้าง) */
+  const DUR = 520;
+  const visKeys = () => KEYS.filter(k => !isHidden(k));
+  const natRects = () => { const o = {}; visKeys().forEach(k => { o[k] = EL[k].getBoundingClientRect(); }); return o; };
+
+  /* offs = ระยะที่แถบนั้นถูกเลื่อนไปอยู่ ณ ตอนปล่อย {x, y, s(สเกล), r(องศาเอียง)} */
+  function swapPanels(a, b, offs = {}) {
+    const wide = matchMedia('(min-width:901px)').matches && !document.querySelector('.wrap').classList.contains('compact');
+    if (wide) KEYS.forEach(k => { const w = Math.round(EL[k].getBoundingClientRect().width); if (w > 0) W[k] = w; });
+    const before = natRects();
+    const i = order.indexOf(a), j = order.indexOf(b);
+    [order[i], order[j]] = [order[j], order[i]];
+    save('panelOrder', order);
+    saveWidths();
+    placeDom();
+    applyWidths();
+    if (REDUCE.matches) return;
+    Object.keys(before).forEach(k => {
+      const el = EL[k], r = el.getBoundingClientRect(), f = before[k];
+      const o = offs[k] || { x: 0, y: 0, s: 1, r: 0 };
+      const dx = f.left - r.left + o.x, dy = f.top - r.top + o.y;
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5 || o.s !== 1) {
+        el.classList.add(k === a ? 'panel-land-top' : 'panel-land');
+        const an = el.animate(
+          [{ transform: `translate(${dx}px,${dy}px) rotate(${o.r || 0}deg) scale(${o.s || 1})` }, { transform: 'translate(0,0) rotate(0deg) scale(1)' }],
+          { duration: DUR, easing: SPRING }
+        );
+        an.onfinish = an.oncancel = () => el.classList.remove('panel-land', 'panel-land-top');
+      }
+      /* แถบที่ความกว้างเปลี่ยน: ค่อย ๆ ขยาย/หดไปด้วย */
+      if (Math.abs(f.width - r.width) > 1 && !el.classList.contains('fill')) {
+        el.animate([{ width: f.width + 'px' }, { width: r.width + 'px' }], { duration: DUR, easing: SMOOTH });
+      }
+    });
+  }
+
+  /* ลากด้วยเมาส์/นิ้ว: เริ่มลากเมื่อขยับเกิน 6px แถบลอยขึ้นและเอียงตามแรงลาก แถบเป้าหมายเลื่อนหลบ แล้วปล่อยเพื่อสลับ */
+  function bindDrag(trigger, k) {
+    trigger.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      e.preventDefault();
+      const src = EL[k], startX = e.clientX, startY = e.clientY;
+      let dragging = false, target = null, nat = null, dx = 0, dy = 0, tilt = 0, lastX = startX, idle = 0;
+      let tOff = { x: 0, y: 0 };
+      const rowLayout = matchMedia('(min-width:901px)').matches;
+      /* แถบเป้าหมายเลื่อนกลับที่เดิมแบบนุ่ม ๆ (คงคลาส panel-shift ไว้จนกว่าจะเลื่อนเสร็จ) */
+      const clearTarget = () => {
+        if (!target) return;
+        const te = EL[target];
+        te.classList.remove('panel-drop');
+        te.style.translate = '';
+        clearTimeout(te._st);
+        te._st = setTimeout(() => te.classList.remove('panel-shift'), 480);
+        target = null; tOff = { x: 0, y: 0 };
+      };
+      /* แถบเป้าหมายเลื่อนไปยังช่องที่แถบที่ลากอยู่ (ตัวอย่างก่อนปล่อย) */
+      const setTarget = t => {
+        if (t === target) return;
+        clearTarget();
+        if (!t) return;
+        target = t;
+        const S = nat[k], T = nat[t];
+        const after = rowLayout ? T.left > S.left : T.top > S.top;
+        tOff = {
+          x: after ? S.left - T.left : S.right - T.right,
+          y: after ? S.top - T.top : S.bottom - T.bottom
+        };
+        const te = EL[t];
+        clearTimeout(te._st);
+        te.classList.add('panel-drop', 'panel-shift');
+        te.style.translate = tOff.x + 'px ' + tOff.y + 'px';
+      };
+      const onMove = ev => {
+        dx = ev.clientX - startX; dy = ev.clientY - startY;
+        if (!dragging) {
+          if (Math.hypot(dx, dy) < 6) return;
+          dragging = true;
+          nat = natRects();
+          src.classList.add('panel-drag');
+          document.body.classList.add('panel-dragging');
+          document.body.style.userSelect = 'none';
+        }
+        /* เอียงตามความเร็วแนวนอน แล้วค่อย ๆ ตั้งตรงเมื่อหยุดลาก */
+        tilt = Math.max(-4, Math.min(4, tilt * 0.6 + (ev.clientX - lastX) * 0.4 * 0.5));
+        lastX = ev.clientX;
+        src.style.translate = dx + 'px ' + dy + 'px';
+        src.style.rotate = tilt + 'deg';
+        clearTimeout(idle);
+        idle = setTimeout(() => { tilt = 0; src.style.rotate = '0deg'; }, 90);
+        /* แถบที่ถูกซ่อนอยู่ไม่รับการวาง */
+        setTarget(KEYS.find(o => {
+          if (o === k || isHidden(o)) return false;
+          const r = nat[o];
+          return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom;
+        }) || null);
+      };
+      const onUp = ev => {
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
+        clearTimeout(idle);
+        if (!dragging) return;
+        const t = ev.type === 'pointerup' ? target : null;
+        const tOffNow = tOff, tilt0 = tilt;
+        /* ถอดสไตล์ระหว่างลากออกทันที (ไม่ใช้ transition) แล้วให้ FLIP ไหลจากตำแหน่งที่ปล่อยไปที่ใหม่ */
+        if (target) {
+          const te = EL[target];
+          clearTimeout(te._st);
+          te.classList.remove('panel-drop', 'panel-shift');
+          te.style.translate = '';
+        }
+        /* แถบอื่นที่ยังเลื่อนกลับค้างอยู่ ให้หยุดทันที */
+        KEYS.forEach(o => { clearTimeout(EL[o]._st); EL[o].classList.remove('panel-shift'); EL[o].style.translate = ''; });
+        src.style.transition = 'none';
+        src.classList.remove('panel-drag');
+        src.style.translate = ''; src.style.rotate = '';
+        void src.offsetWidth; /* บังคับคำนวณเลย์เอาต์ ก่อนวัดตำแหน่งจริง */
+        document.body.classList.remove('panel-dragging');
+        document.body.style.userSelect = '';
+        target = null;
+        const offs = { [k]: { x: dx, y: dy, s: 1.025, r: tilt0 } };
+        if (t) {
+          offs[t] = { x: tOffNow.x, y: tOffNow.y, s: 1, r: 0 };
+          swapPanels(k, t, offs);
+        } else if (!REDUCE.matches) {
+          /* ปล่อยนอกแถบ: แถบกลับที่เดิมแบบสปริง */
+          const an = src.animate(
+            [{ transform: `translate(${dx}px,${dy}px) rotate(${tilt0}deg) scale(1.025)` }, { transform: 'translate(0,0) rotate(0deg) scale(1)' }],
+            { duration: DUR, easing: SPRING }
+          );
+          src.classList.add('panel-land-top');
+          an.onfinish = an.oncancel = () => src.classList.remove('panel-land-top');
+        }
+        src.style.transition = '';
+      };
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+    });
+  }
+
+  const GRIP_SVG = '<svg viewBox="0 0 18 8" width="18" height="8" fill="currentColor" aria-hidden="true"><circle cx="3" cy="2" r="1.3"/><circle cx="9" cy="2" r="1.3"/><circle cx="15" cy="2" r="1.3"/><circle cx="3" cy="6" r="1.3"/><circle cx="9" cy="6" r="1.3"/><circle cx="15" cy="6" r="1.3"/></svg>';
+  const TITLES = { cal: $('#calTitle'), todo: EL.todo.querySelector('h2'), dash: EL.dash.querySelector('h2') };
+  KEYS.forEach(k => {
+    const g = document.createElement('div');
+    g.className = 'panel-grip'; g.tabIndex = 0; g.setAttribute('role', 'button');
+    g.title = 'ลากเพื่อสลับตำแหน่ง';
+    g.setAttribute('aria-label', 'สลับตำแหน่ง' + NAME[k] + ' (ลากด้วยเมาส์ หรือกดปุ่มลูกศร)');
+    g.innerHTML = GRIP_SVG;
+    EL[k].appendChild(g);
+    bindDrag(g, k);
+    if (TITLES[k]) { TITLES[k].classList.add('drag-title'); bindDrag(TITLES[k], k); }
+    /* คีย์บอร์ด: ลูกศรสลับกับแถบข้างเคียงที่แสดงอยู่ */
+    g.addEventListener('keydown', e => {
+      const dir = ({ ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 })[e.key];
+      if (!dir) return;
+      e.preventDefault();
+      const vis = order.filter(x => !isHidden(x));
+      const n = vis[vis.indexOf(k) + dir];
+      if (n) { swapPanels(k, n); g.focus(); }
+    });
+  });
+
+  placeDom();
+  applyWidths();
+  setupResizer(r1, 0);
+  setupResizer(r2, 1);
 }
 
 function getDayOfWeekIndex(dateStr) {
