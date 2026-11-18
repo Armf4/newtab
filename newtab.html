@@ -16,7 +16,7 @@
   --ink: #333333;
   --mute: #6b7c93;
   --line: #c5d1e8;
-  --accent: #8B5CF6;
+  --accent: #8E2F4F;
   --accent-ink: #ffffff;
   --danger: #ef4444;
   --success: #10B981;
@@ -31,7 +31,7 @@
   --ink: #e2e8f0;
   --mute: #94a3b8;
   --line: #1f2330;
-  --accent: #8B5CF6;
+  --accent: #8E2F4F;
   --accent-ink: #ffffff;
   --danger: #f87171;
   --success: #10B981;
@@ -1039,6 +1039,61 @@ main > section{position:relative}
 .panel-land-top{z-index:26}
 @media (prefers-reduced-motion:reduce){.panel-drag,.panel-shift{transition:none !important}}
 body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
+
+/* =====================================================================
+   Lens (แบบที่ 4): แถบทางลัดกระจกดำ + เลนส์เลื่อนตามเมาส์
+   - ลบบล็อกนี้ทิ้งได้ถ้าอยากกลับไปแบบเดิม (JS เลนส์จะไม่มีผลถ้าไม่มี CSS)
+   ===================================================================== */
+:root[data-ui=glass] .side.glass,
+:root[data-ui=glass][data-theme=dark] .side.glass{
+  --ink:#eef2f8; --mute:rgba(255,255,255,.62); --line:rgba(255,255,255,.14);
+  color:var(--ink);
+  background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.025)),rgba(9,10,17,.5);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
+  border-color:rgba(255,255,255,.14);
+  box-shadow:0 24px 60px rgba(0,0,0,.65),inset 0 1px 1px rgba(255,255,255,.34),inset 0 -1px 1px rgba(255,255,255,.05);
+}
+.side-lens{
+  position:absolute;left:0;top:0;width:0;height:0;z-index:0;pointer-events:none;opacity:0;display:none;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  -webkit-backdrop-filter:blur(3px) brightness(1.5) saturate(1.8);backdrop-filter:blur(3px) brightness(1.5) saturate(1.8);
+  box-shadow:inset 0 1.5px 1px rgba(255,255,255,.7),inset 0 -2px 6px rgba(255,255,255,.16),inset 0 0 14px rgba(255,255,255,.1),0 8px 22px rgba(0,0,0,.45);
+  transition:transform .42s cubic-bezier(.32,.72,0,1),width .42s cubic-bezier(.32,.72,0,1),height .42s cubic-bezier(.32,.72,0,1),opacity .2s;
+}
+.side-lens.show{opacity:1}
+.side.glass .tile,.side.glass .fold-toggle,.side.glass .fold-btn{position:relative;z-index:1}
+@media (hover:hover){
+  .side.glass .side-lens{display:block}
+  .side.glass .tile:hover,.side.glass .fold .tile:hover,.side.glass .fold-toggle:hover,.side.glass .add-tile:hover{background:transparent}
+}
+.side.glass .seg{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.side.glass .seg button.on{background:rgba(255,255,255,.12);color:var(--ink);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.55),inset 0 -2px 6px rgba(255,255,255,.12),0 4px 12px rgba(0,0,0,.35)}
+@media (prefers-reduced-motion:reduce){.side-lens{transition:opacity .2s}}
+
+/* =====================================================================
+   ปุ่มหยดน้ำ: หยดตก + คลื่นกระจาย + ปุ่มเด้งยวบ (ลบบล็อกนี้ + บล็อก JS "หยดน้ำ" เพื่อปิด)
+   ===================================================================== */
+.drop-host{contain:paint} /* ตัดเนื้อใน + เป็นกรอบอ้างอิงให้คลื่น โดยไม่เปลี่ยน position ของปุ่ม */
+.drop-core,.drop-ring{position:absolute;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);z-index:3}
+.drop-core{
+  background:radial-gradient(circle at 36% 30%,rgba(255,255,255,.9),color-mix(in srgb,var(--accent) 55%,#fff) 30%,transparent 68%);
+  animation:dropCore .5s cubic-bezier(.2,.7,.3,1) forwards;
+}
+.drop-ring{
+  border:1.5px solid rgba(255,255,255,.65);box-shadow:inset 0 0 10px rgba(255,255,255,.28),0 0 8px rgba(255,255,255,.18);
+  animation:dropRing .8s cubic-bezier(.2,.7,.3,1) forwards;
+}
+.drop-ring.r2{animation-delay:.12s;animation-fill-mode:both;border-color:rgba(255,255,255,.4)}
+@keyframes dropCore{0%{transform:translate(-50%,-50%) scale(.04);opacity:1}55%{opacity:.7}100%{transform:translate(-50%,-50%) scale(.7);opacity:0}}
+@keyframes dropRing{0%{transform:translate(-50%,-50%) scale(.08);opacity:.95}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+.drop-jelly{animation:dropJelly .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes dropJelly{
+  0%{transform:scale(1)}
+  22%{transform:scale(.88,1.07)}
+  50%{transform:scale(1.07,.94)}
+  75%{transform:scale(.98,1.02)}
+  100%{transform:scale(1)}
+}
 </style>
 </head>
 <body>
@@ -1067,7 +1122,6 @@ body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
 
     <form class="search" action="https://www.google.com/search" method="get">
       <input id="q" name="q" type="search" placeholder="ค้นหาด้วย Google" autocomplete="off" autofocus aria-label="ค้นหาด้วย Google">
-      <kbd>/</kbd>
       <button type="submit">ค้นหา</button>
     </form>
   </div>
@@ -1199,13 +1253,6 @@ body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
     <button class="side-close" id="sideClose" type="button" aria-label="ปิดแถบทางลัด">&times;</button>
   </div>
   <nav class="side-list" id="tiles" aria-label="ทางลัดเว็บไซต์"></nav>
-  <div class="side-foot">
-    <div class="side-label">รูปแบบแถบ</div>
-    <div class="seg" id="sideStyleSeg" role="group" aria-label="รูปแบบแถบ">
-      <button type="button" data-style="glass">Liquid Glass</button>
-      <button type="button" data-style="normal">ปกติ</button>
-    </div>
-  </div>
 </aside>
 
 <dialog id="dlg">
@@ -1315,7 +1362,8 @@ setTheme(load('theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dar
 $('#theme').onclick = () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
 
 /* ---------- เปลี่ยนสีหลัก ---------- */
-const ACCENTS = ['#8B5CF6', '#3B82F6', '#14B8A6', '#22C55E', '#F97316', '#EC4899', '#EF4444'];
+/* ชุดสีหลัก Noir Wine (ไวน์ดำ): แดงไวน์ ม่วงองุ่น ม่วงคราม น้ำเงินคราม เขียวน้ำทะเลเข้ม แดงอิฐ ทองแดง */
+const ACCENTS = ['#8E2F4F', '#6B2E5F', '#4F3A7A', '#3A4D8F', '#2B6A7A', '#7A3B3B', '#9A5B2E'];
 function setAccent(c) {
   root.style.setProperty('--accent', c);
   save('accent', c);
@@ -1775,7 +1823,8 @@ function icon(l) {
 }
 
 /* ---------- ตัวเลือกไอคอน (Remix Icon) ---------- */
-const IC_COLORS = ['#4F46E5', '#0D9488', '#7C3AED', '#0891B2', '#EA580C', '#DB2777', '#CA8A04', '#16A34A', '#DC2626', '#475569'];
+/* สีไอคอนทางลัด (โทนมืด ตัวอักษรขาวยังอ่านชัด) */
+const IC_COLORS = ['#3F3AA0', '#0F766E', '#6A3FB0', '#0E6F8C', '#B24E1C', '#A62E64', '#9A7414', '#2B7A47', '#A83232', '#3E4A5C'];
 /* รายชื่อสำรองเผื่อโหลดรายการจาก CDN ไม่ได้ */
 const IC_FALLBACK = 'home-line mail-line youtube-line github-line facebook-circle-line google-line shopping-cart-line briefcase-line chat-3-line star-line folder-line file-text-line calendar-line bank-line money-dollar-circle-line line-chart-line shield-check-line heart-line user-line settings-3-line search-line global-line map-pin-line phone-line camera-line image-line music-line video-line gamepad-line book-open-line article-line cloud-line download-line upload-line lock-line key-line bookmark-line time-line bell-line tools-line code-line terminal-box-line robot-line store-line truck-line wallet-line bank-card-line'.split(' ');
 /* คำค้นภาษาไทย → อังกฤษ */
@@ -1870,7 +1919,8 @@ $('#icReset').onclick = () => { delete icSel.n; renderIcPreview(); $$('#icGrid .
 
 /* ---------- โฟลเดอร์/หมวดทางลัด ---------- */
 /* โครงสร้างข้อมูล: groups = [{id, name, color, collapsed}], links[i].g = id โฟลเดอร์ (ไม่มี = ทั่วไป) */
-const GROUP_COLORS = ['#EF4444', '#F59E0B', '#10B981', '#14B8A6', '#3B82F6', '#8B5CF6', '#EC4899', '#94A3B8'];
+/* สีโฟลเดอร์ (โทนมืด แต่สว่างพอให้ชื่อโฟลเดอร์อ่านชัดบนกระจกดำ) */
+const GROUP_COLORS = ['#C9505A', '#C08A2E', '#2F9A6E', '#2A9A93', '#4C7BC4', '#7E62C9', '#B8477F', '#7C8799'];
 let groups = load('linkGroups', []);
 let generalCollapsed = load('generalCollapsed', false);
 const saveGroups = () => save('linkGroups', groups);
@@ -2163,26 +2213,17 @@ function applyLayoutState() {
   t.setAttribute('aria-label', tl); t.title = tl;
   save('panelHidden', panelHidden); save('toolsCollapsed', toolsCollapsed); save('panelsBackup', panelsBackup);
 }
-/* กดปุ่มปฏิทิน: ถ้ายังมีแถบแสดงอยู่ ซ่อนทั้ง 3 แถบ / ถ้าซ่อนหมดแล้ว แสดงทั้ง 3 แถบ */
+/* กดปุ่มปฏิทิน: ถ้ายังมีแถบแสดงอยู่ ซ่อนทั้ง 3 แถบ / ถ้าซ่อนหมดแล้ว แสดงทั้ง 3 แถบ (เป็นอิสระจากปุ่มลูกศร) */
 $('#panelAllBtn').onclick = () => {
   const keys = Object.keys(PANEL_SEL);
   const hideAll = keys.some(k => !panelHidden[k]);
   keys.forEach(k => { panelHidden[k] = hideAll; });
-  /* ปุ่มนี้อยู่แยกจากแถบเครื่องมือ: ถ้ากดแสดงแถบขณะที่แถบเครื่องมือถูกพับอยู่ ให้คลี่แถบเครื่องมือออกด้วย */
-  if (!hideAll && toolsCollapsed) { toolsCollapsed = false; panelsBackup = null; }
   applyLayoutState();
 };
+/* ปุ่มลูกศร: ดึงเข้า/ออก เฉพาะแถบตัวเลือก (แจ้งเตือน/โหมด/สี/พื้นหลัง) ไม่แตะปฏิทิน ภารกิจ แดชบอร์ด */
 $('#toolsToggle').onclick = () => {
-  if (!toolsCollapsed) { /* ซ่อน: เก็บสถานะแถบไว้ แล้วซ่อนทุกแถบ ให้แถบค้นหาลงมากลางจอ */
-    panelsBackup = Object.assign({}, panelHidden);
-    Object.keys(panelHidden).forEach(k => { panelHidden[k] = true; });
-    toolsCollapsed = true;
-    $('#colorPop').hidden = true; $('#bgPop').hidden = true;
-  } else { /* ขยาย: คืนสถานะแถบเดิม */
-    panelHidden = panelsBackup ? Object.assign({ cal: false, todo: false, dash: false }, panelsBackup) : { cal: false, todo: false, dash: false };
-    panelsBackup = null;
-    toolsCollapsed = false;
-  }
+  toolsCollapsed = !toolsCollapsed;
+  if (toolsCollapsed) { $('#colorPop').hidden = true; $('#bgPop').hidden = true; }
   applyLayoutState();
 };
 applyLayoutState();
@@ -2213,13 +2254,72 @@ $('#sideClose').onclick = () => setSide(false);
 scrimEl.onclick = () => setSide(false);
 $$('#sideStyleSeg button').forEach(b => { b.onclick = () => applySideStyle(b.dataset.style); });
 /* กดลิงก์ทางลัดแล้วปิดแถบ (ไม่นับปุ่มลบ/ปุ่มเพิ่ม) */
+/* พับโฟลเดอร์ทั้งหมดกลับ (หลังกดทางลัดไปเว็บ) — เลื่อนการวาดใหม่ไว้หลังแถบปิดเสร็จ กันลิงก์ถูกลบก่อนเปิดแท็บ */
+function collapseAllFolders() {
+  generalCollapsed = true; save('generalCollapsed', true);
+  groups.forEach(g => { g.collapsed = true; }); saveGroups();
+  setTimeout(renderLinks, 520);
+}
 $('#tiles').addEventListener('click', e => {
-  if (e.target.closest('a.tile') && !e.target.closest('.del')) setSide(false);
+  if (e.target.closest('a.tile') && !e.target.closest('.del')) { setSide(false); collapseAllFolders(); }
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && sideEl.classList.contains('open') && !dlg.open && !grpDlg.open) setSide(false);
 });
-applySideStyle(load('sideStyle', 'glass'));
+applySideStyle('glass'); /* ล็อกเป็น Liquid Glass อย่างเดียว */
+
+/* ---------- เลนส์ (แบบที่ 4) เลื่อนตามเมาส์/โฟกัสในแถบทางลัด ---------- */
+(function () {
+  const list = $('#tiles');
+  const lens = document.createElement('span');
+  lens.className = 'side-lens'; lens.setAttribute('aria-hidden', 'true');
+  const SEL = 'a.tile, .fold-toggle, .add-tile';
+  function moveTo(el) {
+    if (!sideEl.classList.contains('glass')) return;
+    if (!lens.isConnected) list.appendChild(lens);
+    const first = !lens.classList.contains('show');
+    const lr = list.getBoundingClientRect(), r = el.getBoundingClientRect();
+    if (first) lens.style.transition = 'opacity .2s'; /* ครั้งแรก: โผล่ตรงตำแหน่งเลย ไม่บินมาจากมุม */
+    lens.style.width = r.width + 'px'; lens.style.height = r.height + 'px';
+    lens.style.borderRadius = getComputedStyle(el).borderRadius;
+    lens.style.transform = 'translate(' + (r.left - lr.left - list.clientLeft + list.scrollLeft) + 'px,' + (r.top - lr.top - list.clientTop + list.scrollTop) + 'px)';
+    if (first) { void lens.offsetWidth; lens.style.transition = ''; }
+    lens.classList.add('show');
+  }
+  const hide = () => lens.classList.remove('show');
+  list.addEventListener('mouseover', e => { const el = e.target.closest(SEL); if (el) moveTo(el); });
+  list.addEventListener('focusin', e => { const el = e.target.closest(SEL); if (el) moveTo(el); });
+  list.addEventListener('mouseleave', hide);
+  list.addEventListener('focusout', hide);
+  list.addEventListener('scroll', hide, { passive: true });
+  /* renderLinks ล้างเนื้อหา #tiles ทุกครั้ง: ใส่เลนส์กลับเข้าไปใหม่ */
+  new MutationObserver(() => { if (!lens.isConnected) { hide(); list.appendChild(lens); } }).observe(list, { childList: true });
+  list.appendChild(lens);
+})();
+
+/* ---------- อนิเมชันปุ่มเป็นหยดน้ำ: หยดตกกลางจุดที่กด + วงคลื่นกระจาย + ปุ่มเด้งยวบแบบเจลลี่ ---------- */
+(function () {
+  const SEL = '.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.btn,form.search button,.add-tile,.seg button';
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.addEventListener('pointerdown', e => {
+    const b = e.target.closest(SEL);
+    if (!b || b.disabled) return;
+    b.classList.add('drop-host'); /* ตัดคลื่นไม่ให้ล้นขอบปุ่ม (ไม่แตะ position ของปุ่ม) */
+    const r = b.getBoundingClientRect();
+    const size = Math.max(r.width, r.height) * 2.4;
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    ['drop-core', 'drop-ring', 'drop-ring r2'].forEach(c => {
+      const el = document.createElement('span');
+      el.className = c; el.setAttribute('aria-hidden', 'true');
+      el.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + size + 'px;height:' + size + 'px';
+      el.addEventListener('animationend', () => el.remove());
+      b.appendChild(el);
+    });
+    b.classList.remove('drop-jelly'); void b.offsetWidth; /* เริ่มอนิเมชันเด้งใหม่ได้แม้กดรัว */
+    b.classList.add('drop-jelly');
+    b.addEventListener('animationend', ev => { if (ev.target === b) b.classList.remove('drop-jelly'); }, { once: true });
+  }, { passive: true });
+})();
 
 /* ---------- ระบบ Todo & ปฏิทิน ---------- */
 function toggleRepeatEnd() {
