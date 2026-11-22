@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22%3E%3Ccircle%20cx=%2250%22%20cy=%2250%22%20r=%2240%22%20fill=%22none%22%20stroke=%22%23EF4444%22%20stroke-width=%2211%22/%3E%3Cpath%20d=%22M50%2027V50L66%2060%22%20fill=%22none%22%20stroke=%22%23EF4444%22%20stroke-width=%2211%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="/icon-192.png">
-<meta name="theme-color" content="#8B5CF6">
+<meta name="theme-color" content="#08090b">
 <style>
 :root {
   --bg: #e4ebf5;
@@ -16,7 +16,7 @@
   --ink: #333333;
   --mute: #6b7c93;
   --line: #c5d1e8;
-  --accent: #8E2F4F;
+  --accent: #5E6A80;
   --accent-ink: #ffffff;
   --danger: #ef4444;
   --success: #10B981;
@@ -31,7 +31,7 @@
   --ink: #e2e8f0;
   --mute: #94a3b8;
   --line: #1f2330;
-  --accent: #8E2F4F;
+  --accent: #5E6A80;
   --accent-ink: #ffffff;
   --danger: #f87171;
   --success: #10B981;
@@ -864,7 +864,7 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
   --lg-chip:rgba(255,255,255,.45); --lg-chip2:rgba(255,255,255,.68);
   --lg-field:rgba(255,255,255,.5); --lg-pop:rgba(246,249,255,.74); --lg-solid:rgba(240,244,252,.94);
   --lg-blob1:color-mix(in srgb,var(--accent) 38%,transparent);
-  --lg-blob2:rgba(139,92,246,.28); --lg-blob3:rgba(20,184,166,.28);
+  --lg-blob2:rgba(100,110,130,.22); --lg-blob3:rgba(140,150,170,.20);
   --bg:#dbe3f2; --panel:rgba(255,255,255,.45); --ink:#16181f; --mute:rgba(22,24,31,.62); --line:rgba(22,24,31,.12);
   --glass-bg:rgba(255,255,255,.26); --shadow-dark:rgba(60,70,120,.18); --shadow-light:rgba(255,255,255,.6);
 }
@@ -872,16 +872,16 @@ form.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-m
   --lg-a:.09;
   --lg-bd:rgba(255,255,255,.2); --lg-hi:rgba(255,255,255,.42); --lg-sh:rgba(0,0,0,.45);
   --lg-chip:rgba(255,255,255,.08); --lg-chip2:rgba(255,255,255,.15);
-  --lg-field:rgba(255,255,255,.06); --lg-pop:rgba(24,26,38,.62); --lg-solid:rgba(22,24,34,.94);
-  --lg-blob1:color-mix(in srgb,var(--accent) 55%,transparent);
-  --lg-blob2:rgba(139,92,246,.42); --lg-blob3:rgba(20,184,166,.36);
-  --bg:#0a0c13; --panel:rgba(255,255,255,.07); --ink:#eef2f8; --mute:rgba(255,255,255,.62); --line:rgba(255,255,255,.14);
+  --lg-field:rgba(255,255,255,.06); --lg-pop:rgba(22,24,28,.62); --lg-solid:rgba(20,22,26,.94);
+  --lg-blob1:rgba(255,255,255,.10);
+  --lg-blob2:rgba(120,130,150,.20); --lg-blob3:rgba(120,130,150,.14);
+  --bg:#08090b; --panel:rgba(255,255,255,.07); --ink:#eef2f8; --mute:rgba(255,255,255,.62); --line:rgba(255,255,255,.14);
   --glass-bg:rgba(255,255,255,.09); --shadow-dark:rgba(0,0,0,.3); --shadow-light:rgba(255,255,255,.05);
 }
 /* เบราว์เซอร์ที่ไม่รองรับ backdrop-filter: ใช้พื้นทึบขึ้นแทน เพื่อให้ยังอ่านออก */
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   :root[data-ui=glass]{--lg-a:.86;--lg-chip:rgba(255,255,255,.7);--lg-pop:rgba(246,249,255,.97)}
-  :root[data-ui=glass][data-theme=dark]{--lg-a:.12;--lg-chip:rgba(255,255,255,.1);--lg-pop:rgba(24,26,38,.97)}
+  :root[data-ui=glass][data-theme=dark]{--lg-a:.12;--lg-chip:rgba(255,255,255,.1);--lg-pop:rgba(22,24,28,.97)}
 }
 
 /* พื้นหลัง: แสงออโรร่านุ่มๆ ให้กระจกมีสีหักเห (ตามสีหลักที่เลือก) */
@@ -1048,7 +1048,7 @@ body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
 :root[data-ui=glass][data-theme=dark] .side.glass{
   --ink:#eef2f8; --mute:rgba(255,255,255,.62); --line:rgba(255,255,255,.14);
   color:var(--ink);
-  background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.025)),rgba(9,10,17,.5);
+  background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.025)),rgba(10,11,14,.5);
   -webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
   border-color:rgba(255,255,255,.14);
   box-shadow:0 24px 60px rgba(0,0,0,.65),inset 0 1px 1px rgba(255,255,255,.34),inset 0 -1px 1px rgba(255,255,255,.05);
@@ -1058,7 +1058,7 @@ body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
   background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
   -webkit-backdrop-filter:blur(3px) brightness(1.5) saturate(1.8);backdrop-filter:blur(3px) brightness(1.5) saturate(1.8);
   box-shadow:inset 0 1.5px 1px rgba(255,255,255,.7),inset 0 -2px 6px rgba(255,255,255,.16),inset 0 0 14px rgba(255,255,255,.1),0 8px 22px rgba(0,0,0,.45);
-  transition:transform .42s cubic-bezier(.32,.72,0,1),width .42s cubic-bezier(.32,.72,0,1),height .42s cubic-bezier(.32,.72,0,1),opacity .2s;
+  transition:transform .64s cubic-bezier(.34,1.56,.64,1),width .64s cubic-bezier(.34,1.56,.64,1),height .64s cubic-bezier(.34,1.56,.64,1),opacity .2s; /* Jelly Spring: พุ่งเลยเป้าแล้วเด้งกลับ */
 }
 .side-lens.show{opacity:1}
 .side.glass .tile,.side.glass .fold-toggle,.side.glass .fold-btn{position:relative;z-index:1}
@@ -1093,6 +1093,14 @@ body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
   50%{transform:scale(1.07,.94)}
   75%{transform:scale(.98,1.02)}
   100%{transform:scale(1)}
+}
+
+/* โหมดกลางจอ (ซ่อนแถบทั้งหมด): ปักปุ่มไว้มุมจอเสมอ แม้หน้าต่างแคบ (<=900px เดิมจะไหลมาอยู่กลางจอเหนือนาฬิกา) */
+@media (max-width:900px){
+  :root[data-ui=glass] .wrap.centered .topbar{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .wrap.centered .menu-btn{position:fixed;top:16px;left:16px;z-index:6;margin:0}
+  .wrap.centered .header-actions{position:fixed;top:16px;right:16px;z-index:6;margin:0;justify-content:flex-end}
+  .wrap.centered .panel-toggles{position:fixed;top:66px;right:16px;z-index:6;margin:0;flex-wrap:nowrap}
 }
 </style>
 </head>
@@ -1362,8 +1370,8 @@ setTheme(load('theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dar
 $('#theme').onclick = () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
 
 /* ---------- เปลี่ยนสีหลัก ---------- */
-/* ชุดสีหลัก Noir Wine (ไวน์ดำ): แดงไวน์ ม่วงองุ่น ม่วงคราม น้ำเงินคราม เขียวน้ำทะเลเข้ม แดงอิฐ ทองแดง */
-const ACCENTS = ['#8E2F4F', '#6B2E5F', '#4F3A7A', '#3A4D8F', '#2B6A7A', '#7A3B3B', '#9A5B2E'];
+/* ธีม Graphite Mono: เทาเหล็กหลายเฉด (ขาวดำเกือบล้วน) ตัวอักษรขาวบนสีหลักยังอ่านชัด */
+const ACCENTS = ['#5E6A80', '#4F5B70', '#667085', '#58637A', '#6B7280', '#556070', '#707A8E'];
 function setAccent(c) {
   root.style.setProperty('--accent', c);
   save('accent', c);
@@ -2284,6 +2292,10 @@ applySideStyle('glass'); /* ล็อกเป็น Liquid Glass อย่า�
     lens.style.borderRadius = getComputedStyle(el).borderRadius;
     lens.style.transform = 'translate(' + (r.left - lr.left - list.clientLeft + list.scrollLeft) + 'px,' + (r.top - lr.top - list.clientTop + list.scrollTop) + 'px)';
     if (first) { void lens.offsetWidth; lens.style.transition = ''; }
+    else if (lens.animate && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      /* ตัวยวบแบบเจลลี่ (ใช้ scale แยก ไม่ทับ transform ตำแหน่ง) */
+      lens.animate([{ scale: '1' }, { scale: '1.04 .9', offset: .35 }, { scale: '.98 1.05', offset: .68 }, { scale: '1' }], { duration: 640, easing: 'ease-out' });
+    }
     lens.classList.add('show');
   }
   const hide = () => lens.classList.remove('show');
