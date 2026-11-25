@@ -1102,6 +1102,85 @@ body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
   .wrap.centered .header-actions{position:fixed;top:16px;right:16px;z-index:6;margin:0;justify-content:flex-end}
   .wrap.centered .panel-toggles{position:fixed;top:66px;right:16px;z-index:6;margin:0;flex-wrap:nowrap}
 }
+
+/* =====================================================================
+   รอบปรับ: โหมดมืดสีสด + กระจกผ้าลึก + หยดน้ำแบบ macOS (แก้ทับจากข้างบน)
+   ===================================================================== */
+:root[data-ui=glass][data-theme=dark]{
+  --bg:#070612;
+  --lg-blob1:rgba(124,58,237,.55);
+  --lg-blob2:rgba(236,72,153,.36);
+  --lg-blob3:rgba(56,189,248,.34);
+  --lg-a:.12; --lg-blur:40px;
+  --lg-bd:rgba(255,255,255,.2); --lg-hi:rgba(255,255,255,.45); --lg-sh:rgba(4,2,20,.7);
+  --lg-chip:rgba(255,255,255,.10); --lg-chip2:rgba(255,255,255,.2);
+  --mute:rgba(226,232,255,.68);
+}
+/* กระจกผ้าลึก: เบลอหนา + ความหนาแน่นมีชั้น + ขอบเรืองแสงด้านบน */
+:root[data-ui=glass][data-theme=dark] main > section{
+  background-color:rgba(26,18,52,.34);
+  background-image:
+    linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.02) 38%,rgba(255,255,255,0) 60%),
+    radial-gradient(120% 80% at 100% 100%,rgba(236,72,153,.16),transparent 60%),
+    radial-gradient(100% 70% at 0% 0%,rgba(99,102,241,.18),transparent 60%);
+  -webkit-backdrop-filter:blur(40px) saturate(200%) brightness(1.08);
+  backdrop-filter:blur(40px) saturate(200%) brightness(1.08);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),inset 0 -24px 48px -28px rgba(0,0,0,.6),0 34px 70px -24px rgba(0,0,0,.75),0 0 0 1px rgba(0,0,0,.3);
+}
+/* สีเด่นขึ้นในโหมดมืด: ปุ่มหลัก / ปุ่มค้นหา / ตัวเลือกที่เลือก */
+:root[data-ui=glass][data-theme=dark] .search button,
+:root[data-ui=glass][data-theme=dark] .btn:not(.ghost),
+:root[data-ui=glass][data-theme=dark] .filters button[aria-pressed=true],
+:root[data-ui=glass][data-theme=dark] .time-chip.selected{
+  background:linear-gradient(135deg,#6366f1 0%,#a855f7 50%,#ec4899 100%);
+  color:#fff;border:1px solid rgba(255,255,255,.3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 26px -6px rgba(168,85,247,.75);
+}
+:root[data-ui=glass][data-theme=dark] .search kbd{color:#e9d5ff;border-color:rgba(196,181,253,.35)}
+:root[data-ui=glass][data-theme=dark] .clock{background:linear-gradient(90deg,#c4b5fd,#f0abfc 50%,#93c5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+:root[data-ui=glass][data-theme=dark] .calendar-day.today{border-color:#f0abfc;box-shadow:0 0 0 3px rgba(240,171,252,.25)}
+:root[data-ui=glass][data-theme=dark] .stat-bar-fill,
+:root[data-ui=glass][data-theme=dark] .stat-card .bar{background:linear-gradient(90deg,#6366f1,#a855f7,#ec4899)}
+
+/* ไฮไลต์กระจกตามเคอร์เซอร์ (แบบ macOS): แสงวิ่งตามตำแหน่งเมาส์บนปุ่ม */
+:where(.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.btn,form.search button,.add-tile,.seg button,.calendar-header button,.time-chip,.filters button){
+  position:relative;overflow:hidden;isolation:isolate;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,background .3s;
+}
+:where(.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.btn,form.search button,.add-tile,.seg button,.calendar-header button,.time-chip,.filters button)::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+  background:radial-gradient(160px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.34),transparent 62%);
+  opacity:0;transition:opacity .35s;
+}
+:where(.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.btn,form.search button,.add-tile,.seg button,.calendar-header button,.time-chip,.filters button):hover::after{opacity:1}
+:where(.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.btn,.add-tile,.calendar-header button):hover{transform:translateY(-1px) scale(1.03)}
+
+/* หยดน้ำ: หยดของเหลวกระจายเป็นวงบาง ๆ พร้อมแสง + ปุ่มเด้งแบบ spring */
+.drop-core{
+  background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.95),rgba(255,255,255,.35) 35%,transparent 70%);
+  filter:blur(.6px);
+}
+.drop-ring{
+  border:1.5px solid rgba(255,255,255,.8);
+  background:radial-gradient(circle,transparent 56%,rgba(255,255,255,.22) 72%,transparent 82%);
+  box-shadow:inset 0 0 12px rgba(255,255,255,.35),0 0 14px rgba(196,181,253,.35);
+  filter:blur(.3px);
+}
+.drop-ring.r2{border-color:rgba(240,171,252,.55)}
+@keyframes dropCore{0%{transform:translate(-50%,-50%) scale(.04);opacity:1}50%{opacity:.8}100%{transform:translate(-50%,-50%) scale(.8);opacity:0}}
+@keyframes dropRing{0%{transform:translate(-50%,-50%) scale(.06);opacity:.95}70%{transform:translate(-50%,-50%) scale(1.04);opacity:.35}100%{transform:translate(-50%,-50%) scale(1.08);opacity:0}}
+@keyframes dropJelly{
+  0%{transform:scale(1,1)}
+  16%{transform:scale(.9,1.09)}
+  36%{transform:scale(1.07,.92)}
+  58%{transform:scale(.975,1.03)}
+  80%{transform:scale(1.012,.99)}
+  100%{transform:scale(1,1)}
+}
+@media (prefers-reduced-motion:reduce){
+  .drop-jelly,.drop-core,.drop-ring{animation:none !important;opacity:0}
+}
 </style>
 </head>
 <body>
@@ -1369,6 +1448,7 @@ function setTheme(t) {
 setTheme(load('theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 $('#theme').onclick = () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark');
 
+
 /* ---------- เปลี่ยนสีหลัก ---------- */
 /* ธีม Graphite Mono: เทาเหล็กหลายเฉด (ขาวดำเกือบล้วน) ตัวอักษรขาวบนสีหลักยังอ่านชัด */
 const ACCENTS = ['#5E6A80', '#4F5B70', '#667085', '#58637A', '#6B7280', '#556070', '#707A8E'];
@@ -1412,6 +1492,11 @@ const BG_MODES = [
   { id: 'sakura',    label: 'กลีบซากุระ' },
   { id: 'bubbles',   label: 'ฟองสบู่' },
   { id: 'clouds',    label: 'เมฆลอย' },
+  { id: 'smoke',     label: 'ควันลอยขึ้น' },
+  { id: 'horizon',   label: 'แสงขอบฟ้าหายใจ' },
+  { id: 'fog',       label: 'หมอกลอย' },
+  { id: 'rain',      label: 'ฝนกลางคืน' },
+  { id: 'snow',      label: 'หิมะเบาๆ' },
   { id: 'none',      label: 'ไม่มีอนิเมชั่น' }
 ];
 /* ไอคอนของแต่ละโหมด (แสดงบนปุ่ม) */
@@ -1426,6 +1511,11 @@ const BG_ICONS = {
   sakura:    '<path d="M12 12c-4-2-4-7 0-9 4 2 4 7 0 9zM12 12c4-2 9 0 9 5-4 3-8 1-9-5zM12 12c-4-2-9 0-9 5 4 3 8 1 9-5z"/>',
   bubbles:   '<circle cx="9" cy="14" r="5"/><circle cx="17" cy="7" r="3"/><path d="M7 12a3 3 0 012-2"/>',
   clouds:    '<path d="M7 18a4 4 0 010-8 5 5 0 019.6 1.4A3.3 3.3 0 0117 18z"/>',
+  smoke:     '<path d="M8 20c-2-3 2-4 0-7s2-4 0-7M15 20c-2-3 2-4 0-7s2-4 0-7"/>',
+  horizon:   '<path d="M3 18h18M6.5 18a5.5 5.5 0 0111 0M12 6v2M5.6 9.6l1.4 1.4M18.4 9.6L17 11"/>',
+  fog:       '<path d="M4 8h12M8 12h12M4 16h12"/>',
+  rain:      '<path d="M7 14a4 4 0 010-8 5 5 0 019.6 1.4A3.3 3.3 0 0117 14zM8 20l1-3M13 20l1-3M18 20l1-3"/>',
+  snow:      '<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/>',
   none:      '<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>'
 };
 function updateBgIcon() {
@@ -1489,6 +1579,14 @@ function initMode() {
     S.items = Array.from({ length: clamp(Math.round(bgW / 60), 10, 28) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), r: rnd(12, 38), v: rnd(20, 50), w: rnd(0, 6.283) }));
   } else if (bgMode === 'clouds') {
     S.items = Array.from({ length: 6 }, (_, i) => ({ x: rnd(-200, bgW), y: bgH * (.08 + i * .16) + rnd(-20, 20), r: rnd(55, 100), v: rnd(8, 22), tone: i % 2 }));
+  } else if (bgMode === 'smoke') {
+    S.items = Array.from({ length: clamp(Math.round(bgW / 110), 8, 16) }, () => ({ x: rnd(bgW * .15, bgW * .85), s: rnd(.03, .07), p: rnd(0, 1), w: rnd(0, 6.283) }));
+  } else if (bgMode === 'fog') {
+    S.items = Array.from({ length: 7 }, () => ({ x: rnd(0, bgW), y: bgH * rnd(.45, 1), r: bgW * rnd(.25, .45), v: rnd(5, 15) }));
+  } else if (bgMode === 'rain') {
+    S.items = Array.from({ length: clamp(Math.round(bgW / 12), 60, 160) }, () => ({ x: rnd(0, bgW + bgH * .15), y: rnd(0, bgH), l: rnd(8, 22), v: rnd(260, 420) }));
+  } else if (bgMode === 'snow') {
+    S.items = Array.from({ length: clamp(Math.round(area / 16000), 50, 140) }, () => ({ x: rnd(0, bgW), y: rnd(0, bgH), r: rnd(.5, 2.3), v: rnd(8, 22), w: rnd(0, 6.283) }));
   }
   bgState = S;
 }
@@ -1653,6 +1751,62 @@ const bgDraw = {
       });
     });
     bctx.globalCompositeOperation = 'source-over';
+  },
+  /* ควันลอยขึ้น: ก้อนควันบางๆ ขยายและจางหายระหว่างลอย */
+  smoke(t) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    const mx = Math.max(bgW, bgH), c0 = bgDark ? '190,200,225' : '90,100,130';
+    bgState.items.forEach(o => {
+      const k = (t / 1000 * o.s + o.p) % 1;
+      const x = o.x + Math.sin(k * 6 + o.w) * bgW * .05, y = bgH * (1.1 - k * 1.2), r = mx * (.06 + k * .14);
+      const g = bctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(${c0},${(bgDark ? .11 : .09) * Math.sin(k * Math.PI)})`); g.addColorStop(1, `rgba(${c0},0)`);
+      bctx.fillStyle = g; bctx.fillRect(x - r, y - r, r * 2, r * 2);
+    });
+  },
+  /* แสงขอบฟ้าหายใจ: แสงสีหลักที่ขอบล่างค่อยๆ สว่างขึ้นลง */
+  horizon(t) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    const k = .5 + .5 * Math.sin(t / 2000), h = bgAccent.h, L = bgDark ? 48 : 62;
+    const g = bctx.createLinearGradient(0, bgH, 0, bgH * (.45 - .12 * k));
+    g.addColorStop(0, `hsla(${h},70%,${L}%,${(bgDark ? .28 : .22) + .12 * k})`); g.addColorStop(1, `hsla(${h},70%,${L}%,0)`);
+    bctx.fillStyle = g; bctx.fillRect(0, 0, bgW, bgH);
+    bctx.fillStyle = `hsla(${h},70%,${bgDark ? 70 : 45}%,.35)`; bctx.fillRect(0, bgH - 1, bgW, 1);
+  },
+  /* หมอกลอย: ก้อนหมอกนุ่มๆ เลื่อนช้าๆ ใกล้ขอบล่าง */
+  fog(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    const c0 = bgDark ? '170,185,215' : '120,135,165';
+    bgState.items.forEach(o => {
+      o.x += o.v * dt;
+      if (o.x - o.r > bgW) o.x = -o.r;
+      const g = bctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+      g.addColorStop(0, `rgba(${c0},${bgDark ? .09 : .12})`); g.addColorStop(1, `rgba(${c0},0)`);
+      bctx.fillStyle = g; bctx.fillRect(o.x - o.r, o.y - o.r, o.r * 2, o.r * 2);
+    });
+  },
+  /* ฝนกลางคืน: เส้นฝนบางๆ เอียงเล็กน้อย โทนตามสีหลัก */
+  rain(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bctx.lineWidth = 1;
+    bctx.strokeStyle = `hsla(${bgAccent.h},40%,${bgDark ? 70 : 40}%,${bgDark ? .28 : .3})`;
+    bctx.beginPath();
+    bgState.items.forEach(o => {
+      o.y += o.v * dt; o.x -= o.v * .12 * dt;
+      if (o.y > bgH + 30 || o.x < -30) { o.y = -20; o.x = rnd(0, bgW + bgH * .15); }
+      bctx.moveTo(o.x, o.y); bctx.lineTo(o.x - o.l * .12, o.y + o.l);
+    });
+    bctx.stroke();
+  },
+  /* หิมะเบาๆ: เกล็ดเล็กตกช้าๆ แกว่งซ้ายขวานิดหน่อย */
+  snow(t, dt) {
+    bctx.clearRect(0, 0, bgW, bgH);
+    bgState.items.forEach(o => {
+      o.y += o.v * dt; o.x += Math.cos(t / 2000 + o.w) * 7 * dt;
+      if (o.y > bgH + 5) { o.y = -5; o.x = rnd(0, bgW); }
+      bctx.fillStyle = bgDark ? `rgba(220,230,255,${.25 + o.r * .2})` : `rgba(110,130,170,${.3 + o.r * .15})`;
+      bctx.beginPath(); bctx.arc(o.x, o.y, o.r, 0, 6.283); bctx.fill();
+    });
   }
 };
 
@@ -2330,6 +2484,18 @@ applySideStyle('glass'); /* ล็อกเป็น Liquid Glass อย่า�
     b.classList.remove('drop-jelly'); void b.offsetWidth; /* เริ่มอนิเมชันเด้งใหม่ได้แม้กดรัว */
     b.classList.add('drop-jelly');
     b.addEventListener('animationend', ev => { if (ev.target === b) b.classList.remove('drop-jelly'); }, { once: true });
+  }, { passive: true });
+})();
+
+/* ---------- ตำแหน่งเคอร์เซอร์บนปุ่ม (ใช้กับแสงกระจกที่วิ่งตามเมาส์) ---------- */
+(function () {
+  const SEL = '.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.btn,form.search button,.add-tile,.seg button,.calendar-header button,.time-chip,.filters button';
+  document.addEventListener('pointermove', e => {
+    const b = e.target.closest && e.target.closest(SEL);
+    if (!b) return;
+    const r = b.getBoundingClientRect();
+    b.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    b.style.setProperty('--my', (e.clientY - r.top) + 'px');
   }, { passive: true });
 })();
 
