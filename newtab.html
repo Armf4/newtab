@@ -1108,9 +1108,9 @@ body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
    ===================================================================== */
 :root[data-ui=glass][data-theme=dark]{
   --bg:#070612;
-  --lg-blob1:rgba(124,58,237,.55);
-  --lg-blob2:rgba(236,72,153,.36);
-  --lg-blob3:rgba(56,189,248,.34);
+  --lg-blob1:color-mix(in srgb,var(--accent) 55%,transparent);
+  --lg-blob2:rgba(120,110,190,.30);
+  --lg-blob3:rgba(90,120,200,.26);
   --lg-a:.12; --lg-blur:40px;
   --lg-bd:rgba(255,255,255,.2); --lg-hi:rgba(255,255,255,.45); --lg-sh:rgba(4,2,20,.7);
   --lg-chip:rgba(255,255,255,.10); --lg-chip2:rgba(255,255,255,.2);
@@ -1133,15 +1133,15 @@ body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
 :root[data-ui=glass][data-theme=dark] .btn:not(.ghost),
 :root[data-ui=glass][data-theme=dark] .filters button[aria-pressed=true],
 :root[data-ui=glass][data-theme=dark] .time-chip.selected{
-  background:linear-gradient(135deg,#6366f1 0%,#a855f7 50%,#ec4899 100%);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 78%,#fff) 0%,var(--accent) 55%,color-mix(in srgb,var(--accent) 70%,#000) 100%);
   color:#fff;border:1px solid rgba(255,255,255,.3);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 26px -6px rgba(168,85,247,.75);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 26px -6px color-mix(in srgb,var(--accent) 75%,transparent);
 }
-:root[data-ui=glass][data-theme=dark] .search kbd{color:#e9d5ff;border-color:rgba(196,181,253,.35)}
-:root[data-ui=glass][data-theme=dark] .clock{background:linear-gradient(90deg,#c4b5fd,#f0abfc 50%,#93c5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
-:root[data-ui=glass][data-theme=dark] .calendar-day.today{border-color:#f0abfc;box-shadow:0 0 0 3px rgba(240,171,252,.25)}
+:root[data-ui=glass][data-theme=dark] .search kbd{color:color-mix(in srgb,var(--accent) 40%,#fff);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+:root[data-ui=glass][data-theme=dark] .clock{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 45%,#fff),var(--accent) 60%,color-mix(in srgb,var(--accent) 60%,#fff));-webkit-background-clip:text;background-clip:text;color:transparent}
+:root[data-ui=glass][data-theme=dark] .calendar-day.today{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
 :root[data-ui=glass][data-theme=dark] .stat-bar-fill,
-:root[data-ui=glass][data-theme=dark] .stat-card .bar{background:linear-gradient(90deg,#6366f1,#a855f7,#ec4899)}
+:root[data-ui=glass][data-theme=dark] .stat-card .bar{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 70%,#000),var(--accent),color-mix(in srgb,var(--accent) 70%,#fff))}
 
 /* ไฮไลต์กระจกตามเคอร์เซอร์ (แบบ macOS): แสงวิ่งตามตำแหน่งเมาส์บนปุ่ม */
 :where(.theme-btn,.sys-btn,.color-btn,.menu-btn,.tools-toggle,.pt-btn,.btn,form.search button,.add-tile,.seg button,.calendar-header button,.time-chip,.filters button){
@@ -1164,10 +1164,10 @@ body.panel-dragging,body.panel-dragging *{cursor:grabbing !important}
 .drop-ring{
   border:1.5px solid rgba(255,255,255,.8);
   background:radial-gradient(circle,transparent 56%,rgba(255,255,255,.22) 72%,transparent 82%);
-  box-shadow:inset 0 0 12px rgba(255,255,255,.35),0 0 14px rgba(196,181,253,.35);
+  box-shadow:inset 0 0 12px rgba(255,255,255,.35),0 0 14px color-mix(in srgb,var(--accent) 45%,transparent);
   filter:blur(.3px);
 }
-.drop-ring.r2{border-color:rgba(240,171,252,.55)}
+.drop-ring.r2{border-color:color-mix(in srgb,var(--accent) 60%,#fff)}
 @keyframes dropCore{0%{transform:translate(-50%,-50%) scale(.04);opacity:1}50%{opacity:.8}100%{transform:translate(-50%,-50%) scale(.8);opacity:0}}
 @keyframes dropRing{0%{transform:translate(-50%,-50%) scale(.06);opacity:.95}70%{transform:translate(-50%,-50%) scale(1.04);opacity:.35}100%{transform:translate(-50%,-50%) scale(1.08);opacity:0}}
 @keyframes dropJelly{
@@ -1488,10 +1488,6 @@ const BG_MODES = [
   { id: 'bokeh',     label: 'Bokeh' },
   { id: 'embers',    label: 'ประกายไฟ' },
   { id: 'meteors',   label: 'ดาวตก' },
-  { id: 'neon',      label: 'ฝนนีออน' },
-  { id: 'sakura',    label: 'กลีบซากุระ' },
-  { id: 'bubbles',   label: 'ฟองสบู่' },
-  { id: 'clouds',    label: 'เมฆลอย' },
   { id: 'smoke',     label: 'ควันลอยขึ้น' },
   { id: 'horizon',   label: 'แสงขอบฟ้าหายใจ' },
   { id: 'fog',       label: 'หมอกลอย' },
